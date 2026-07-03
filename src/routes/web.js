@@ -7,7 +7,7 @@ let router = express.Router();
 let initWebRoutes = (app) => {
   router.get("/loginform", homeController.loginForm);
   router.get("/", homeController.getHomePage);
-  router.get("/crud", homeController.getCurd);
+  router.get("/getregister", homeController.getRegisterForm);
 
   router.post("/login", homeController.login);
 
@@ -20,9 +20,15 @@ let initWebRoutes = (app) => {
 
   router.get("/productvariant/:id", homeController.getProductVar);
 
+  router.post("/product/findVariant", protectedRoute, homeController.findProductVariant);
+  router.get(
+    "/product/:id/color/:colorId/sizes",
+    homeController.getSizes
+  );
+
   return app.use("/", router);
 };
 
-let inntAuth = (app) => {};
+let inntAuth = (app) => { };
 
 export { initWebRoutes };

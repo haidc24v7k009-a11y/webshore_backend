@@ -1,65 +1,86 @@
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>crud</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
-      crossorigin="anonymous"
-    />
-    <script
-      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-      integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js"
-      integrity="sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y"
-      crossorigin="anonymous"
-    ></script>
-  </head>
-  <body>
-    <div class="container">
-      <form class="row g-3" action="/edit/<%= prod.id %>" method="POST">
-        <h1><%= prod.id %></h1>
-        <div class="col-md-12">
-          <label for="inputFullname" class="form-label">Name</label>
-          <input
-            type="text"
-            class="form-control"
-            id="inputFullname"
-            name="productName"
-            value="<%= prod.productName %>"
-          />
-        </div>
-        <div class="col-md-12">
-          <label for="inputEmail4" class="form-label">Email</label>
-          <input
-            type="number"
-            class="form-control"
-            id="inputEmail4"
-            name="price"
-            value="<%= prod.price %>"
-          />
-        </div>
-      
-        <div class="col-md-12">
-          <% prodVar.forEach((item, index) => { %>
-            <h3><%= item.id %></h3>
-            <span><%= item.color_id %> </span>
-             <span><%= item.Color.color_name %> </span>
-             <span><%= item.Size.size_number %> </span>
-             
-          <% }) %>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>crud</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous" />
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js"
+    integrity="sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y"
+    crossorigin="anonymous"></script>
+</head>
+
+<body>
+  <div class="container">
+    <form class="row g-3" action="/product/findVariant" method="POST">
+
+      <!-- Hidden input to store the product ID for form submission -->
+      <input type="hidden" name="product_id" value="<%= prod.id %>">
+
+
+      <h1>
+        <%= prod.id %>
+      </h1>
+      <div class="col-md-12">
+        <label for="inputFullname" class="form-label">Name</label>
+        <input type="text" class="form-control" id="inputFullname" name="productName" value="<%= prod.productName %>" />
+      </div>
+      <div class="col-md-12">
+        <label for="inputEmail4" class="form-label">price</label>
+        <input type="number" class="form-control" id="inputEmail4" name="price" value="<%= prod.price %>" />
+      </div>
+
+      <div class="col-md-12">
+        <label for="inputEmail4" class="form-label">quantity</label>
+        <input type="number" class="form-control" id="inputEmail4" name="quantity" value="1" />
+        <span>Available Quantity: <%= variantCount %></span>
+      </div>
+
+      <div class="col-md-6">
+
+        <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+          <% colors.forEach((item, index)=> { %>
+            <input type="radio" class="btn-check" name="color_id" id="color<%= item.id %>" value="<%= item.id %>"
+              autocomplete="off" <%=index===0 ? "checked" : "" %>
+            >
+            <label class="btn btn-outline-primary" for="color<%= item.id %>">
+              <%= item.color_name %>
+            </label>
+            <% }) %>
+
         </div>
 
-        <div class="col-12">
-          <button type="submit" class="btn btn-primary">update</button>
+
+      </div>
+
+      <div class="col-md-6">
+
+        <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+          <% sizes.forEach((item, index)=> { %>
+            <input type="radio" class="btn-check" name="size_id" id="size<%= item.id %>" value="<%= item.id %>"
+              autocomplete="off" <%=index===0 ? "checked" : "" %>
+            >
+            <label class="btn btn-outline-primary" for="size<%= item.id %>">
+              <%= item.size_number %>
+            </label>
+            <% }) %>
+
         </div>
-      </form>
-      
-    </div>
-  </body>
+
+      </div>
+
+
+
+      <div class="col-12">
+        <button type="submit" class="btn btn-primary">find</button>
+      </div>
+    </form>
+
+  </div>
+</body>
+
 </html>

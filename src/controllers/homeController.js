@@ -16,7 +16,7 @@ let getHomePage = async (req, res) => {
   }
 };
 
-let getCurd = (req, res) => {
+let getRegisterForm = (req, res) => {
   return res.render("crud.ejs");
 };
 
@@ -53,11 +53,51 @@ let getProductVar = async (req, res) => {
 
   let prod = await productService.getProductById(prodId);
   let prodVar = await productService.getProdVarByProdId(prodId);
+
+
   return res.render("productvariant.ejs", {
     prod: prod,
-    prodVar: prodVar,
+    prodDetail: prodVar.productVars,
+    variantCount: prodVar.count,
+    colors: prodVar.colors,
+    sizes: prodVar.sizes,
+
   });
 };
+let getSizes = async (req, res) => {
+
+  let sizes = await productService.getSizes(
+    req.params.id,
+    req.params.colorId
+  );
+
+  res.json(sizes);
+}
+
+let addtoCart = async (userId, product_variant_id, quantity) => {
+  try {
+    await productService.addToCart(userId, product_variant_id, quantity);
+    return console.log("Added to cart successfully");
+  } catch (error) {
+    console.error(error);
+    return console.error("Failed to add to cart");
+  }
+};
+
+let findProductVariant = async (req, res) => {
+  let { product_id, color_id, size_id } = req.body;
+  console.log("req.body: ", req.body);
+  let variant = await productService.findVariant(product_id, color_id, size_id);
+  console.log("variant: ", variant);
+
+  let { quantity } = req.body;
+  let userId = req.user.id;
+  await addtoCart(userId, variant.id, quantity);
+
+  res.json({
+    variant: variant,
+  });
+}
 
 let getUserInfo = async (req, res) => {
   let id = req.params.id;
@@ -126,7 +166,7 @@ let logout = async (req, res) => {
 
 export default {
   getHomePage,
-  getCurd,
+  getRegisterForm,
   registerUser,
   getDataCRUD,
   getUserInfo,
@@ -136,4 +176,7 @@ export default {
   logout,
   getProductData,
   getProductVar,
+  findProductVariant,
+  getSizes,
+  addtoCart,
 };
