@@ -16,27 +16,6 @@ let getHomePage = async (req, res) => {
   }
 };
 
-let getRegisterForm = (req, res) => {
-  return res.render("crud.ejs");
-};
-
-let registerUser = async (req, res) => {
-  try {
-    let message = await CRUDService.createNewUser(req.body);
-    return res.send(message);
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-let getDataCRUD = async (req, res) => {
-  let data = await CRUDService.getAllUser();
-  console.log(req.user);
-  return res.render("displayCRUD.ejs", {
-    user: req.user,
-    dataTable: data,
-  });
-};
 
 let getProductData = async (req, res) => {
   let productData = await productService.getAllProduct();
@@ -53,7 +32,7 @@ let getProductVar = async (req, res) => {
 
   let prod = await productService.getProductById(prodId);
   let prodVar = await productService.getProdVarByProdId(prodId);
-
+  let images = await productService.getImagesByProductId(prodId);
 
   return res.render("productvariant.ejs", {
     prod: prod,
@@ -61,7 +40,7 @@ let getProductVar = async (req, res) => {
     variantCount: prodVar.count,
     colors: prodVar.colors,
     sizes: prodVar.sizes,
-
+    images: images,
   });
 };
 let getSizes = async (req, res) => {
@@ -119,35 +98,35 @@ let editUser = async (req, res) => {
   }
 };
 
-let loginForm = (req, res) => {
-  let message = "helo";
-  return res.render("loginForm.ejs", {
-    message: message,
-  });
-};
-let login = async (req, res) => {
-  try {
-    const result = await CRUDService.login(req);
+// let loginForm = (req, res) => {
+//   let message = "helo";
+//   return res.render("loginForm.ejs", {
+//     message: message,
+//   });
+// };
+// let login = async (req, res) => {
+//   try {
+//     const result = await CRUDService.login(req);
 
-    if (!result) {
-      return res.status(401).json({
-        message: "Username or password is incorrect",
-      });
-    }
+//     if (!result) {
+//       return res.status(401).json({
+//         message: "Username or password is incorrect",
+//       });
+//     }
 
-    res.cookie("accessToken", result.accessToken, {
-      httpOnly: true,
-    });
+//     res.cookie("accessToken", result.accessToken, {
+//       httpOnly: true,
+//     });
 
-    return res.json({
-      accessToken: result.accessToken,
-      user: result.user,
-    });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json(error);
-  }
-};
+//     return res.json({
+//       accessToken: result.accessToken,
+//       user: result.user,
+//     });
+//   } catch (error) {
+//     console.log(error);
+//     return res.status(500).json(error);
+//   }
+// };
 
 let logout = async (req, res) => {
   try {
@@ -164,19 +143,42 @@ let logout = async (req, res) => {
   }
 };
 
+let createProductForm = async (req, res) => {
+  let categories = await productService.getAllCategories();
+  let brands = await productService.getAllBrands();
+  return res.render("insertproduct.ejs", {
+    cates: categories,
+    brands: brands,
+  });
+};
+
+let createProduct = async (req, res) => {
+  try {
+
+    const data = req.body;
+    const files = req.files;
+
+    const result = await productService.createProduct(data, files);
+
+    return res.redirect("/product");;
+
+  } catch (e) {
+    console.log(e);
+  }
+}
+
 export default {
   getHomePage,
-  getRegisterForm,
-  registerUser,
-  getDataCRUD,
   getUserInfo,
   editUser,
-  loginForm,
-  login,
+  // loginForm,
+  // login,
   logout,
   getProductData,
   getProductVar,
   findProductVariant,
   getSizes,
   addtoCart,
+  createProductForm,
+  createProduct
 };

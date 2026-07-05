@@ -1,26 +1,9 @@
 import db from "../models/index";
+import cloudinary from "../config/cloudinary";
+import streamifier from "streamifier";
 
-let getAllProduct = () => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      let products = db.Product.findAll({
-        include: [
-          {
-            model: db.Category,
-            attributes: ["id", "categoryName"],
-          },
-          {
-            model: db.Brand,
-            attributes: ["id", "brandName"],
-          },
-        ],
-      });
-      resolve(products);
-    } catch (e) {
-      reject(e);
-    }
-  });
-};
+
+//LOAD DATA BY ID
 
 let getProductById = (id) => {
   console.log("service; ", id);
@@ -95,46 +78,94 @@ let getProdVarByProdId = (productId) => {
   });
 };
 
+let getImagesByProductId = (productId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let images = await db.ProductImage.findAll({
+        where: { product_id: productId },
+      });
+      resolve(images);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
 
-// let getColors = async (productId) => {
-//   return await db.Color.findAll({
-//     attributes: ["id", "color_name"],
-//     include: [
-//       {
-//         model: db.ProductVariant,
-//         attributes: [],
-//         where: {
-//           product_id: productId,
-//           quantity: {
-//             [db.Sequelize.Op.gt]: 0,
-//           },
-//         },
-//       },
-//     ],
-//     group: ["Color.id", "Color.color_name"]
-//   });
-// };
+//LOAD DATA
 
-// let getSizes = async (productId, colorId) => {
-//   return await db.Size.findAll({
-//     attributes: ["id", "size_number"],
-//     include: [
-//       {
-//         model: db.ProductVariant,
-//         attributes: [],
-//         where: {
-//           product_id: productId,
-//           color_id: colorId,
-//           quantity: {
-//             [db.Sequelize.Op.gt]: 0,
-//           },
-//         },
-//       },
-//     ],
-//     group: ["Size.id"],
-//   });
-// };
+let getAllProduct = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let products = db.Product.findAll({
+        include: [
+          {
+            model: db.Category,
+            attributes: ["id", "categoryName"],
+          },
+          {
+            model: db.Brand,
+            attributes: ["id", "brandName"],
+          },
+        ],
+      });
+      resolve(products);
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
 
+let getAllCategories = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let categories = await db.Category.findAll({
+        attributes: ["id", "categoryName"],
+      });
+      resolve(categories);
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
+let getAllBrands = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let brands = await db.Brand.findAll({
+        attributes: ["id", "brandName"],
+      });
+      resolve(brands);
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
+let getAllColors = async () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let colors = await db.Color.findAll({
+        attributes: ["id", "color_name"],
+      });
+      resolve(colors);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+let getAllSizes = async () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let sizes = await db.Size.findAll({
+        attributes: ["id", "size_number"],
+      });
+      resolve(sizes);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
 
 let findVariant = async (product_id, color_id, size_id) => {
   return new Promise(async (resolve, reject) => {
@@ -169,12 +200,87 @@ let addToCart = async (userId, variantId, quantity) => {
   });
 };
 
+
+//***********CLOUDINARY UPLOAD***********/
+const uploadToCloudinary = (file) => {
+
+  return new Promise((resolve, reject) => {
+
+    const stream = cloudinary.uploader.upload_stream(
+
+      {
+        folder: "products"
+      },
+
+      (error, result) => {
+
+        if (error) return reject(error);
+
+        resolve(result);
+
+      }
+
+    );
+
+    streamifier
+      .createReadStream(file.buffer)
+      .pipe(stream);
+
+  });
+
+};
+
+//CRUD Service for Product, ProductVariant, Color, Size, CartItem
+
+let createProduct = (data, files) => {
+  return new Promise(async (resolve, reject) => {
+    const transaction = await db.sequelize.transaction();
+    try {
+      const product = await db.Product.create({
+        productName: data.productName,
+        price: data.price,
+        category_id: data.category_id,
+        brand_id: data.brand_id,
+        product_description: data.product_description
+      }, { transaction });
+
+      if (files && files.length > 0) {
+
+        let images = [];
+
+        for (const file of files) {
+          const uploadResult = await uploadToCloudinary(file);
+          images.push({
+            product_id: product.id,
+            image_path: uploadResult.secure_url
+          });
+        }
+
+        await db.ProductImage.bulkCreate(images, {
+          transaction
+        });
+      }
+      await transaction.commit();
+      resolve(product);
+    } catch (error) {
+      await transaction.rollback();
+      reject(error);
+    }
+  });
+};
+
 export default {
   getAllProduct,
   getProductById,
   getProdVarByProdId,
   findVariant,
   addToCart,
+  createProduct,
+  getAllCategories,
+  getAllBrands,
+  getAllColors,
+  getAllSizes,
+  getImagesByProductId,
   // getColors,
   // getSizes
 };

@@ -106,14 +106,15 @@ let createToken = (user) => {
   );
 
   const refreshToken = randomBytes(64).toString("hex");
+  console.log("refreshToken: ", refreshToken);
 
   return new Promise(async (resolve, reject) => {
     console.log("user =", user);
     console.log("user.id =", user?.id);
     await db.RefreshToken.create({
-      token: refreshToken,
+      refresh_token: refreshToken,
       user_id: user.id,
-      expiresAt: Date.now() + REFRESH_TOKEN_TTL,
+      expires_at: Date.now() + REFRESH_TOKEN_TTL,
     });
     resolve({ accessToken, refreshToken });
   });
@@ -136,7 +137,7 @@ let login = async (req) => {
   }
 
   const { accessToken, refreshToken } = await createToken(user);
-
+  console.log("TLL: ", accessToken.ACCESS_TOKENN_TTL);
   return {
     user,
     accessToken,
@@ -151,7 +152,7 @@ let logout = async (req, res) => {
     if (refreshToken) {
       await db.RefreshToken.destroy({
         where: {
-          token: refreshToken,
+          refresh_token: refreshToken,
         },
       });
     }
@@ -162,7 +163,36 @@ let logout = async (req, res) => {
   }
 };
 
-export { logout };
+
+let refreshToken = async (req) => {
+  const refreshToken = req.cookies.refreshToken;
+
+  if (!refreshToken) {
+    return null;
+  }
+
+  const token = await db.RefreshToken.findOne({
+    where: {
+      refresh_token: refreshToken,
+    },
+  });
+
+  if (!token) {
+    return null;
+  }
+
+  if (new Date(token.expires_at) < new Date()) {
+    await token.destroy();
+    return null;
+  }
+
+  // Rotation
+  await token.destroy();
+
+  return await createToken(token.user_id);
+};
+
+
 
 export default {
   createNewUser,
@@ -173,4 +203,5 @@ export default {
   login,
   createToken,
   logout,
+  refreshToken,
 };

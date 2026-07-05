@@ -74,7 +74,12 @@
       </div>
 
 
-
+      <div class="col-12">
+        <% images.forEach((item, index)=> { %>
+          <img src="<%= item.image_path %>" alt="Image <%= index + 1 %>"
+            style="max-width: 100px; margin-right: 10px;" />
+          <% }) %>
+      </div>
       <div class="col-12">
         <button type="submit" class="btn btn-primary">find</button>
       </div>
