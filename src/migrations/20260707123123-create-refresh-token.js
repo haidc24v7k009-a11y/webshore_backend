@@ -2,38 +2,35 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("EmployeeRefreshTokens", {
+    await queryInterface.createTable("RefreshTokens", {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
+      },
+
+      account_id: {
+        type: Sequelize.INTEGER,
         allowNull: false,
       },
 
-      employee_id: {
-        type: Sequelize.INTEGER,
+      account_type: {
+        type: Sequelize.ENUM("user", "employee"),
         allowNull: false,
-        references: {
-          model: "Employees",
-          key: "employee_id",
-        },
-        onUpdate: "CASCADE",
-        onDelete: "CASCADE",
       },
 
       refresh_token: {
-        type: Sequelize.TEXT,
+        type: Sequelize.STRING(255),
         allowNull: false,
+        unique: true,
       },
 
       device_info: {
         type: Sequelize.STRING,
-        allowNull: true,
       },
 
       revoked: {
         type: Sequelize.BOOLEAN,
-        allowNull: false,
         defaultValue: false,
       },
 
@@ -42,21 +39,21 @@ module.exports = {
         allowNull: false,
       },
 
-      created_at: {
-        type: Sequelize.DATE,
+      createdAt: {
         allowNull: false,
-        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+        type: Sequelize.DATE,
       },
-
-      updated_at: {
-        type: Sequelize.DATE,
+      updatedAt: {
         allowNull: false,
-        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+        type: Sequelize.DATE,
+      },
+      lastLogin: {
+        type: Sequelize.DATE,
       },
     });
   },
 
   async down(queryInterface) {
-    await queryInterface.dropTable("EmployeeRefreshTokens");
-  },
+    await queryInterface.dropTable("RefreshTokens");
+  }
 };

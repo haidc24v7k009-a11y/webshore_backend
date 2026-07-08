@@ -40,17 +40,19 @@ let login = async (req, res) => {
       sameSite: "strict",
       maxAge: 14 * 24 * 60 * 60 * 1000,
     });
+    if (result.type === "employee") {
+      return res.render("adminpage.ejs");
+    }
 
-
-    return res.json({
-      accessToken: result.accessToken,
-      user: result.user,
-    });
+    return res.redirect("/");
   } catch (error) {
     console.log(error);
     return res.status(500).json(error);
   }
 };
+
+
+
 let getDataUsers = async (req, res) => {
   let data = await CRUDService.getAllUser();
   console.log(req.user);

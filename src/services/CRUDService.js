@@ -95,25 +95,30 @@ let editUser = (userId, data) => {
   });
 };
 
-let createToken = (user) => {
-  let ACCESS_TOKENN_TTL = "15m";
+let createToken = async (account, accountType) => {
+  let ACCESS_TOKEN_TTL = "15m";
   let REFRESH_TOKEN_TTL = 14 * 24 * 60 * 60 * 1000;
 
+  const payload = {
+    id: account.id,
+    type: accountType, // "user" | "employee"
+  };
   const accessToken = jwt.sign(
-    { userId: user.id },
+    payload,
     process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: ACCESS_TOKENN_TTL },
+    {
+      expiresIn: ACCESS_TOKEN_TTL,
+    }
   );
 
   const refreshToken = randomBytes(64).toString("hex");
   console.log("refreshToken: ", refreshToken);
 
   return new Promise(async (resolve, reject) => {
-    console.log("user =", user);
-    console.log("user.id =", user?.id);
     await db.RefreshToken.create({
+      account_id: account.id,
+      account_type: accountType,
       refresh_token: refreshToken,
-      user_id: user.id,
       expires_at: Date.now() + REFRESH_TOKEN_TTL,
     });
     resolve({ accessToken, refreshToken });
@@ -121,28 +126,45 @@ let createToken = (user) => {
 };
 
 let login = async (req) => {
+
+  const { username, password } = req.body;
+
   let user = await db.User.findOne({
-    where: { username: req.body.username },
-    raw: true,
+    where: { username }
   });
 
-  if (!user) {
-    return null;
+  if (user) {
+    if (!bcrypt.compareSync(password, user.password)) {
+      return null;
+    }
+    const { accessToken, refreshToken } = await createToken(user, "user");
+
+    return {
+      account: user,
+      type: "user",
+      accessToken,
+      refreshToken
+    }
   }
-
-  let check = bcrypt.compareSync(req.body.password, user.password);
-
-  if (!check) {
-    return null;
+  let employee = await db.Employee.findOne({
+    where: {
+      username
+    }
+  });
+  if (employee) {
+    if (!bcrypt.compareSync(password, employee.password)) {
+      return null;
+    }
+    const { accessToken, refreshToken } = await createToken(employee, "employee");
+    return {
+      account: employee,
+      type: "employee",
+      accessToken,
+      refreshToken
+    }
   }
-
-  const { accessToken, refreshToken } = await createToken(user);
-  console.log("TLL: ", accessToken.ACCESS_TOKENN_TTL);
-  return {
-    user,
-    accessToken,
-    refreshToken,
-  };
+  console.log("TLL: ", accessToken.ACCESS_TOKEN_TTL);
+  return null;
 };
 
 let logout = async (req, res) => {
@@ -174,6 +196,7 @@ let refreshToken = async (req) => {
   const token = await db.RefreshToken.findOne({
     where: {
       refresh_token: refreshToken,
+      raw: true,
     },
   });
 
@@ -186,10 +209,21 @@ let refreshToken = async (req) => {
     return null;
   }
 
-  // Rotation
+  let account;
+
+  if (token.account_type === "user") {
+
+    account = await db.User.findByPk(token.user_id);
+
+  } else {
+
+    account = await db.Employee.findByPk(token.user_id);
+
+  }
+
   await token.destroy();
 
-  return await createToken(token.user_id);
+  return await createToken(account, token.account_type);
 };
 
 

@@ -2,27 +2,29 @@
 const { Model } = require("sequelize");
 
 module.exports = (sequelize, DataTypes) => {
-  class RefreshToken extends Model {
-    static associate(models) {
-      RefreshToken.belongsTo(models.User, {
-        foreignKey: "user_id",
-        as: "user",
-      });
-    }
-  }
+  class RefreshToken extends Model { }
 
   RefreshToken.init(
     {
-      user_id: DataTypes.INTEGER,
-      refresh_token: DataTypes.TEXT,
+      account_id: DataTypes.INTEGER,
+
+      account_type: DataTypes.ENUM("user", "employee"),
+
+      refresh_token: DataTypes.STRING,
+
       device_info: DataTypes.STRING,
+
       revoked: DataTypes.BOOLEAN,
+
       expires_at: DataTypes.DATE,
     },
     {
       sequelize,
       modelName: "RefreshToken",
-    },
+      tableName: "RefreshTokens",
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+    }
   );
 
   return RefreshToken;

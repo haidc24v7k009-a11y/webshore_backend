@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      Employee.hasMany(models.EmployeeRefreshToken, {
+      Employee.hasMany(models.RefreshToken, {
         foreignKey: "employee_id"
       });
 
@@ -37,8 +37,10 @@ module.exports = (sequelize, DataTypes) => {
     gender: DataTypes.BOOLEAN,
     status: DataTypes.BOOLEAN,
     avatar: DataTypes.STRING,
-    last_login: DataTypes.DATE,
-    role_id: DataTypes.INTEGER
+    role_id: DataTypes.INTEGER,
+    createdAt: DataTypes.DATE,
+    updatedAt: DataTypes.DATE,
+    lastLogin: DataTypes.DATE,
   }, {
     sequelize,
     modelName: 'Employee',
