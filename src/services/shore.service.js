@@ -24,15 +24,15 @@ let getProdVarByProdId = (productId) => {
   return new Promise(async (resolve, reject) => {
     try {
       let productVars = await db.ProductVariant.findAll({
-        where: { product_id: productId, quantity: { [db.Sequelize.Op.gt]: 0 } },
+        where: { product_id: productId, stock: { [db.Sequelize.Op.gt]: 0 } },
         include: [
           {
             model: db.Color,
-            attributes: ["id", "color_name"],
+            attributes: ["id", "colorName"],
           },
           {
             model: db.Size,
-            attributes: ["id", "size_number"],
+            attributes: ["id", "sizeNumber"],
           },
         ],
       });
@@ -44,7 +44,7 @@ let getProdVarByProdId = (productId) => {
             v.Color.id,
             {
               id: v.Color.id,
-              color_name: v.Color.color_name,
+              colorName: v.Color.colorName,
             },
           ])
         ).values(),
@@ -57,7 +57,7 @@ let getProdVarByProdId = (productId) => {
             v.Size.id,
             {
               id: v.Size.id,
-              size_number: v.Size.size_number,
+              sizeNumber: v.Size.sizeNumber,
             },
           ])
         ).values(),
@@ -66,14 +66,15 @@ let getProdVarByProdId = (productId) => {
       let count = await db.ProductVariant.count({
         where: {
           product_id: productId,
-          quantity: {
+          stock: {
             [db.Sequelize.Op.gt]: 0,
           },
         },
       });
       resolve({ productVars, count, colors, sizes });
     } catch (error) {
-      reject(error);
+      console.error(error);
+      throw error;
     }
   });
 };

@@ -23,6 +23,10 @@ module.exports = (sequelize, DataTypes) => {
       ProductVariant.hasMany(models.OrderItem, {
         foreignKey: "product_variant_id",
       });
+      ProductVariant.hasMany(models.ImportReceiptDetail, {
+        foreignKey: "product_variant_id",
+      });
+
     }
   }
 
@@ -31,7 +35,6 @@ module.exports = (sequelize, DataTypes) => {
       product_id: DataTypes.INTEGER,
       size_id: DataTypes.INTEGER,
       color_id: DataTypes.INTEGER,
-      quantity: DataTypes.INTEGER,
       sku: DataTypes.STRING,
       stock: DataTypes.INTEGER,
       deleted: DataTypes.BOOLEAN,

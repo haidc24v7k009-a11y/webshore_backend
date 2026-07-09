@@ -24,6 +24,7 @@ let initWebRoutes = (app) => {
     homeController.getSizes
   );
 
+
   return app.use("/", router);
 };
 

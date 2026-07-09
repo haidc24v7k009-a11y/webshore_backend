@@ -3,7 +3,7 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable("ImportReceipts", {
-      import_receipt_id: {
+      id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
@@ -14,7 +14,7 @@ module.exports = {
         allowNull: false,
         references: {
           model: "Suppliers",
-          key: "supplier_id",
+          key: "id",
         },
         onUpdate: "CASCADE",
         onDelete: "RESTRICT",
@@ -25,7 +25,7 @@ module.exports = {
         allowNull: false,
         references: {
           model: "Employees",
-          key: "employee_id",
+          key: "id",
         },
         onUpdate: "CASCADE",
         onDelete: "RESTRICT",

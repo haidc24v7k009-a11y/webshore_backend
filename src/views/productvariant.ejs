@@ -36,7 +36,7 @@
 
       <div class="col-md-12">
         <label for="inputEmail4" class="form-label">quantity</label>
-        <input type="number" class="form-control" id="inputEmail4" name="quantity" value="1" />
+        <input type="number" class="form-control" id="inputEmail4" name="stock" value="1" />
         <span>Available Quantity: <%= variantCount %></span>
       </div>
 
@@ -48,7 +48,7 @@
               autocomplete="off" <%=index===0 ? "checked" : "" %>
             >
             <label class="btn btn-outline-primary" for="color<%= item.id %>">
-              <%= item.color_name %>
+              <%= item.colorName %>
             </label>
             <% }) %>
 
@@ -65,7 +65,7 @@
               autocomplete="off" <%=index===0 ? "checked" : "" %>
             >
             <label class="btn btn-outline-primary" for="size<%= item.id %>">
-              <%= item.size_number %>
+              <%= item.sizeNumber %>
             </label>
             <% }) %>
 

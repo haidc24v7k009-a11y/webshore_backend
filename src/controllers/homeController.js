@@ -26,6 +26,12 @@ let getProductData = async (req, res) => {
   });
 };
 
+let importReceipt = async (req, res) => {
+  return res.render("importreceipt.ejs", {
+    user: req.user,
+  });
+};
+
 let getProductVar = async (req, res) => {
   let prodId = req.params.id;
   console.log(prodId);
@@ -180,5 +186,6 @@ export default {
   getSizes,
   addtoCart,
   createProductForm,
-  createProduct
+  createProduct,
+  importReceipt
 };

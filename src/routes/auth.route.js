@@ -1,6 +1,7 @@
 import express from "express";
 import homeController from "../controllers/homeController";
 import authController from "../controllers/authh.controller.js";
+import adminController from "../controllers/admin.controller.js";
 import { protectedRoute } from "../middleware/authMiddleware";
 
 let router = express.Router();
@@ -19,6 +20,8 @@ let initAuthRoutes = (app) => {
   router.get("/getdatausers", protectedRoute, authController.getDataUsers);
   router.get("/user/:id", authController.getUserInfo);
   router.post("/edit/:id", authController.editUser);
+
+  router.get("/importreceipt", protectedRoute, adminController.initImportReceipt);
 
   return app.use("/", router);
 };

@@ -37,11 +37,6 @@ module.exports = {
         },
       },
 
-      quantity: {
-        type: Sequelize.INTEGER,
-        defaultValue: 0,
-      },
-
       sku: {
         type: Sequelize.STRING,
         unique: true,

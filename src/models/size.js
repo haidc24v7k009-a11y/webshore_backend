@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
 
   Size.init(
     {
-      size_number: DataTypes.STRING,
+      sizeNumber: DataTypes.STRING,
       status: DataTypes.BOOLEAN,
       deleted: DataTypes.BOOLEAN,
     },

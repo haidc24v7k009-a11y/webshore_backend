@@ -12,13 +12,13 @@ module.exports = (sequelize, DataTypes) => {
 
   Supplier.init(
     {
-      supplier_name: DataTypes.STRING,
+      supplierName: DataTypes.STRING,
       representative: DataTypes.STRING,
       phone: DataTypes.STRING,
       email: DataTypes.STRING,
       address: DataTypes.STRING,
-      create_date: DataTypes.DATE,
-      update_date: DataTypes.DATE,
+      createdAt: DataTypes.DATE,
+      updatedAt: DataTypes.DATE,
     },
     {
       sequelize,

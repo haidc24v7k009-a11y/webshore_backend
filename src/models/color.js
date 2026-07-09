@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
 
   Color.init(
     {
-      color_name: DataTypes.STRING,
+      colorName: DataTypes.STRING,
       status: DataTypes.BOOLEAN,
       deleted: DataTypes.BOOLEAN,
     },
