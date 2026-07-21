@@ -34,14 +34,6 @@ let protectedRoute = async (req, res, next) => {
 
         }
 
-        // //find user
-        // let user = await db.User.findOne({
-        //   where: {
-        //     id: decodedUser.userId,
-        //   },
-        //   raw: true,
-        // });
-
         if (!account) {
           return res.status(404).json({ message: "User not found" });
         }

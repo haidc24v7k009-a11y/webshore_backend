@@ -9,9 +9,15 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "import_receipt_id",
       });
 
-      ImportReceiptDetail.belongsTo(models.ProductVariant, {
-        foreignKey: "product_variant_id",
+      ImportReceiptDetail.belongsTo(models.Product, {
+        foreignKey: "product_id",
       });
+      ImportReceiptDetail.belongsTo(models.Color, {
+        foreignKey: "color_id",
+      })
+      ImportReceiptDetail.belongsTo(models.Size, {
+        foreignKey: "size_id",
+      })
 
     }
   }
@@ -20,6 +26,8 @@ module.exports = (sequelize, DataTypes) => {
     {
       import_receipt_id: DataTypes.INTEGER,
       product_id: DataTypes.INTEGER,
+      color_id: DataTypes.INTEGER,
+      size_id: DataTypes.INTEGER,
       quantity: DataTypes.INTEGER,
       price: DataTypes.DECIMAL,
       subtotal: DataTypes.DECIMAL,

@@ -160,18 +160,26 @@ let createProductForm = async (req, res) => {
 
 let createProduct = async (req, res) => {
   try {
-
     const data = req.body;
     const files = req.files;
 
     const result = await productService.createProduct(data, files);
-
-    return res.redirect("/product");;
+    console.log(files)
+    return res.status(201).json({
+      success: true,
+      message: "Thêm sản phẩm thành công",
+      data: result
+    });
 
   } catch (e) {
     console.log(e);
+
+    return res.status(500).json({
+      success: false,
+      message: "Thêm sản phẩm thất bại"
+    });
   }
-}
+};
 
 export default {
   getHomePage,

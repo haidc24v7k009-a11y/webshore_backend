@@ -7,6 +7,9 @@ module.exports = (sequelize, DataTypes) => {
       Color.hasMany(models.ProductVariant, {
         foreignKey: "color_id",
       });
+      Color.hasMany(models.ImportReceiptDetail, {
+        foreignKey: "color_id",
+      });
     }
   }
 

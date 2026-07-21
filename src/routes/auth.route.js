@@ -23,7 +23,7 @@ let initAuthRoutes = (app) => {
 
   router.get("/importreceipt", protectedRoute, adminController.initImportReceipt);
 
-  return app.use("/", router);
+  return app.use("/api", router);
 };
 
 export { initAuthRoutes };

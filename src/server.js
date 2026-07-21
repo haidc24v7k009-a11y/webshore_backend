@@ -3,6 +3,7 @@ import bodyParser from "body-parser";
 import viewEngine from "./config/viewEngine";
 import { initAuthRoutes } from "./routes/auth.route.js";
 import { initWebRoutes } from "./routes/webclient.route.js";
+import { initAdminRoutes } from "./routes/admin.route.js";
 import connectDB from "./config/connectDB";
 import cookieParser from "cookie-parser";
 import { protectedRoute } from "./middleware/authMiddleware";
@@ -33,6 +34,7 @@ viewEngine(app);
 //init web routes
 initAuthRoutes(app);
 initWebRoutes(app);
+initAdminRoutes(app);
 
 connectDB();
 let port = process.env.PORT || 8000;

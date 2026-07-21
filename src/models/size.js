@@ -7,6 +7,9 @@ module.exports = (sequelize, DataTypes) => {
       Size.hasMany(models.ProductVariant, {
         foreignKey: "size_id",
       });
+      Size.hasMany(models.ImportReceiptDetail, {
+        foreignKey: "size_id",
+      });
     }
   }
 

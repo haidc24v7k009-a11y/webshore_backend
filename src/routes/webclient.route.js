@@ -25,7 +25,9 @@ let initWebRoutes = (app) => {
   );
 
 
-  return app.use("/", router);
+
+
+  return app.use("/api", router);
 };
 
 export { initWebRoutes };

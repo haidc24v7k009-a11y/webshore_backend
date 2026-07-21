@@ -40,9 +40,13 @@ let login = async (req, res) => {
       sameSite: "strict",
       maxAge: 14 * 24 * 60 * 60 * 1000,
     });
-    if (result.type === "employee") {
-      return res.render("adminpage.ejs");
-    }
+    return res.status(200).json({
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
+      type: result.type,
+      account: result.account,
+    });
+
 
     return res.redirect("/");
   } catch (error) {

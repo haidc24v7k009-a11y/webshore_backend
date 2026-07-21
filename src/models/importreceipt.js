@@ -26,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
       employee_id: DataTypes.INTEGER,
       import_date: DataTypes.DATE,
       confirm_date: DataTypes.DATE,
+      total: DataTypes.DECIMAL(12, 2),
       note: DataTypes.TEXT,
       status: DataTypes.BOOLEAN,
     },
