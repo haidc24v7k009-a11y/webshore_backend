@@ -2,7 +2,7 @@ import express from "express";
 import homeController from "../controllers/homeController";
 import authController from "../controllers/authh.controller.js";
 import adminController from "../controllers/admin.controller.js";
-import { protectedRoute } from "../middleware/authMiddleware";
+import { protectedRoute, employeeOnly } from "../middleware/authMiddleware";
 import { upload } from "../middleware/upload.middleware";
 let router = express.Router();
 
@@ -21,7 +21,7 @@ let initAdminRoutes = (app) => {
 
     router.get(
         "/import-receipt",
-        protectedRoute,
+        protectedRoute, employeeOnly,
         adminController.initImportReceipt
     );
     router.post(

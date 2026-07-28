@@ -51,4 +51,16 @@ let protectedRoute = async (req, res, next) => {
     });
   }
 };
-export { protectedRoute };
+
+const employeeOnly = (req, res, next) => {
+
+  if (req.account.type !== "employee") {
+    return res.status(403).json({
+      message: "Bạn không có quyền truy cập."
+    });
+  }
+
+  next();
+};
+
+export { protectedRoute, employeeOnly };

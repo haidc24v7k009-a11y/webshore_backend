@@ -104,6 +104,10 @@ let getAllProduct = () => {
             attributes: ["id", "categoryName"],
           },
           {
+            model: db.ProductImage,
+            attributes: ["image_path"]
+          },
+          {
             model: db.Brand,
             attributes: ["id", "brandName"],
           },
@@ -146,7 +150,7 @@ let getAllColors = async () => {
   return new Promise(async (resolve, reject) => {
     try {
       let colors = await db.Color.findAll({
-        attributes: ["id", "color_name"],
+        attributes: ["id", "colorName"],
       });
       resolve(colors);
     } catch (error) {
@@ -159,7 +163,7 @@ let getAllSizes = async () => {
   return new Promise(async (resolve, reject) => {
     try {
       let sizes = await db.Size.findAll({
-        attributes: ["id", "size_number"],
+        attributes: ["id", "sizeNumber"],
       });
       resolve(sizes);
     } catch (error) {

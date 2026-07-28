@@ -8,8 +8,8 @@ let router = express.Router();
 let initWebRoutes = (app) => {
 
   router.get("/", homeController.getHomePage);
-  router.get("/product", protectedRoute, homeController.getProductData);
-  router.get("/productvariant/:id", homeController.getProductVar);
+  router.get("/shoes", homeController.getProductData);
+  router.get("/shoes/:id", homeController.getProductVar);
 
   router.get("/product/create", protectedRoute, homeController.createProductForm);
 

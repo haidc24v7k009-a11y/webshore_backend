@@ -20,9 +20,10 @@ let getHomePage = async (req, res) => {
 let getProductData = async (req, res) => {
   let productData = await productService.getAllProduct();
 
-  return res.render("product.ejs", {
-    user: req.user,
-    dataTable: productData,
+  return res.status(200).json({
+    message: "load product success",
+    data: productData,
+
   });
 };
 
@@ -40,13 +41,20 @@ let getProductVar = async (req, res) => {
   let prodVar = await productService.getProdVarByProdId(prodId);
   let images = await productService.getImagesByProductId(prodId);
 
-  return res.render("productvariant.ejs", {
-    prod: prod,
-    prodDetail: prodVar.productVars,
-    variantCount: prodVar.count,
+  return res.json({
+
+    product: prod,
+
+    variants: prodVar.productVars,
+
     colors: prodVar.colors,
+
     sizes: prodVar.sizes,
+
     images: images,
+
+    count: prodVar.count
+
   });
 };
 let getSizes = async (req, res) => {

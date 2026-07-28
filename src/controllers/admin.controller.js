@@ -13,6 +13,7 @@ let initImportReceipt = async (req, res) => {
             let categories = await adminService.getAllCategories()
             let importReceipts = await adminService.getImportReceipts()
             return res.status(200).json({
+                categories: categories,
                 suppliers: suppliers,
                 products: products,
                 sizes: sizes,
