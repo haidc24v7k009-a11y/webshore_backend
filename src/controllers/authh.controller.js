@@ -9,7 +9,11 @@ let getRegisterForm = (req, res) => {
 let registerUser = async (req, res) => {
   try {
     let message = await CRUDService.createNewUser(req.body);
-    return res.send(message);
+
+    return res.status(200).json({
+      errCode: 0,
+      message: message
+    });
   } catch (error) {
     console.log(error);
   }
@@ -67,13 +71,26 @@ let getDataUsers = async (req, res) => {
 };
 
 let getUserInfo = async (req, res) => {
-  let id = req.params.id;
-  let user = await CRUDService.getUserInfoById(id);
-  let message = "";
-  return res.render("infoUser.ejs", {
-    data: user,
-    message: message,
-  });
+  try {
+
+    const user = req.user;
+    console.log("uuuuuuuuuuuuuuuuuuu", user)
+    return res.status(200).json({
+      errCode: 0,
+      message: "Success",
+      data: user
+    });
+
+  } catch (e) {
+
+    console.error("getUserInfo Error:", e);
+
+    return res.status(500).json({
+      errCode: -1,
+      message: e,
+      stack: e.stack
+    });
+  } ư
 };
 
 let editUser = async (req, res) => {
@@ -83,6 +100,30 @@ let editUser = async (req, res) => {
     return res.send(message);
   } catch (error) {
     console.log(error);
+  }
+};
+
+let updateAvatar = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        errCode: 1,
+        message: "Please select an image."
+      });
+    }
+    const userId = req.user.id;
+    const avatar = await CRUDService.updateAvatar(userId, req.file);
+    return res.status(200).json({
+      errCode: 0,
+      message: "Avatar updated successfully.",
+      avatar
+    });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({
+      errCode: -1,
+      message: e.message
+    });
   }
 };
 
@@ -130,5 +171,6 @@ export default {
   loginForm,
   login,
   refreshToken,
-  logout
+  logout,
+  updateAvatar
 };

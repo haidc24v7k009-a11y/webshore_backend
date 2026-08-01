@@ -2,6 +2,10 @@ import db from "../models/index";
 import jwt from "jsonwebtoken";
 import env from "dotenv";
 import { randomBytes } from "crypto";
+import cloudinary from "../config/cloudinary";
+import streamifier from "streamifier";
+import { where } from "sequelize";
+
 env.config();
 
 const bcrypt = require("bcrypt");
@@ -93,6 +97,34 @@ let editUser = (userId, data) => {
       reject(error);
     }
   });
+};
+
+let updateAvatar = (userId, file) => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        folder: "avatars"
+      },
+      async (error, result) => {
+        if (error) {
+          return reject(error);
+        }
+        await db.User.update(
+          {
+            avatar: result.secure_url
+          },
+          {
+            where: {
+              id: userId
+            }
+          }
+        );
+        resolve(result.secure_url);
+      }
+    );
+    streamifier.createReadStream(file.buffer).pipe(stream);
+  });
+
 };
 
 let createToken = async (account, accountType) => {
@@ -227,7 +259,6 @@ let refreshToken = async (req) => {
 };
 
 
-
 export default {
   createNewUser,
   hashPassword,
@@ -238,4 +269,5 @@ export default {
   createToken,
   logout,
   refreshToken,
+  updateAvatar,
 };
