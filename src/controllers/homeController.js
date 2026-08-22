@@ -16,14 +16,12 @@ let getHomePage = async (req, res) => {
   }
 };
 
-
 let getProductData = async (req, res) => {
   let productData = await productService.getAllProduct();
 
   return res.status(200).json({
     message: "load product success",
     data: productData,
-
   });
 };
 
@@ -42,7 +40,6 @@ let getProductVar = async (req, res) => {
   let images = await productService.getImagesByProductId(prodId);
 
   return res.json({
-
     product: prod,
 
     variants: prodVar.productVars,
@@ -53,44 +50,124 @@ let getProductVar = async (req, res) => {
 
     images: images,
 
-    count: prodVar.count
-
+    count: prodVar.count,
   });
 };
 let getSizes = async (req, res) => {
-
-  let sizes = await productService.getSizes(
-    req.params.id,
-    req.params.colorId
-  );
+  let sizes = await productService.getSizes(req.params.id, req.params.colorId);
 
   res.json(sizes);
-}
+};
 
-let addtoCart = async (userId, product_variant_id, quantity) => {
+//----------------CART CONTROLLER----------------//
+let addToCart = async (req, res) => {
   try {
-    await productService.addToCart(userId, product_variant_id, quantity);
-    return console.log("Added to cart successfully");
+    const { product_id, color_id, size_id, quantity } = req.body;
+
+    const variant = await productService.findVariant(
+      product_id,
+
+      color_id,
+
+      size_id,
+    );
+
+    if (!variant) {
+      return res.status(404).json({
+        errCode: 1,
+
+        message: "Variant not found.",
+      });
+    }
+
+    const result = await productService.addToCart(
+      req.user.id,
+
+      variant.id,
+
+      quantity,
+    );
+
+    return res.status(200).json(result);
   } catch (error) {
-    console.error(error);
-    return console.error("Failed to add to cart");
+    console.log(error);
+
+    return res.status(500).json({
+      errCode: -1,
+
+      message: "Server error.",
+    });
   }
 };
 
-let findProductVariant = async (req, res) => {
-  let { product_id, color_id, size_id } = req.body;
-  console.log("req.body: ", req.body);
-  let variant = await productService.findVariant(product_id, color_id, size_id);
-  console.log("variant: ", variant);
+let getCart = async (req, res) => {
+  try {
+    const cart = await productService.getCart(req.user.id);
 
-  let { quantity } = req.body;
-  let userId = req.user.id;
-  await addtoCart(userId, variant.id, quantity);
+    return res.status(200).json({
+      errCode: 0,
 
-  res.json({
-    variant: variant,
-  });
-}
+      message: "Success",
+
+      data: cart,
+    });
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({
+      errCode: -1,
+
+      message: "Server Error",
+    });
+  }
+};
+
+let updateCartItem = async (req, res) => {
+  try {
+    const cartItemId = req.params.id;
+
+    const { quantity } = req.body;
+
+    const result = await productService.updateCartItem(
+      req.user.id,
+
+      cartItemId,
+
+      quantity,
+    );
+
+    return res.status(200).json(result);
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({
+      errCode: -1,
+
+      message: "Server error.",
+    });
+  }
+};
+
+let deleteCartItem = async (req, res) => {
+  try {
+    const result = await productService.deleteCartItem(
+      req.user.id,
+
+      req.params.id,
+    );
+
+    return res.status(200).json(result);
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({
+      errCode: -1,
+
+      message: "Server error.",
+    });
+  }
+};
+//----------------------------------------------------------
 
 let getUserInfo = async (req, res) => {
   let id = req.params.id;
@@ -172,19 +249,18 @@ let createProduct = async (req, res) => {
     const files = req.files;
 
     const result = await productService.createProduct(data, files);
-    console.log(files)
+    console.log(files);
     return res.status(201).json({
       success: true,
       message: "Thêm sản phẩm thành công",
-      data: result
+      data: result,
     });
-
   } catch (e) {
     console.log(e);
 
     return res.status(500).json({
       success: false,
-      message: "Thêm sản phẩm thất bại"
+      message: "Thêm sản phẩm thất bại",
     });
   }
 };
@@ -198,10 +274,15 @@ export default {
   logout,
   getProductData,
   getProductVar,
-  findProductVariant,
+  // findProductVariant,
   getSizes,
-  addtoCart,
   createProductForm,
   createProduct,
-  importReceipt
+  importReceipt,
+  //--cart--
+  addToCart,
+  getCart,
+  updateCartItem,
+  deleteCartItem
+
 };

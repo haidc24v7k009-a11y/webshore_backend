@@ -8,7 +8,7 @@ import { upload } from "../middleware/upload.middleware.js";
 let router = express.Router();
 
 let initAuthRoutes = (app) => {
-  router.get("/loginform", authController.loginForm);
+  // router.get("/loginform", authController.loginForm);
   router.get("/getregister", authController.getRegisterForm);
 
   router.post("/register", authController.registerUser);

@@ -13,7 +13,7 @@ let initAdminRoutes = (app) => {
         upload.array("images", 10),
         homeController.createProduct
     );
-    router.post("/product/findVariant", protectedRoute, homeController.findProductVariant);
+    // router.post("/product/findVariant", protectedRoute, homeController.findProductVariant);
     router.get(
         "/product/:id/color/:colorId/sizes",
         homeController.getSizes

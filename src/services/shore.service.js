@@ -2,7 +2,6 @@ import db from "../models/index";
 import cloudinary from "../config/cloudinary";
 import streamifier from "streamifier";
 
-
 //LOAD DATA BY ID
 
 let getProductById = (id) => {
@@ -46,7 +45,7 @@ let getProdVarByProdId = (productId) => {
               id: v.Color.id,
               colorName: v.Color.colorName,
             },
-          ])
+          ]),
         ).values(),
       ];
 
@@ -59,7 +58,7 @@ let getProdVarByProdId = (productId) => {
               id: v.Size.id,
               sizeNumber: v.Size.sizeNumber,
             },
-          ])
+          ]),
         ).values(),
       ];
 
@@ -105,7 +104,7 @@ let getAllProduct = () => {
           },
           {
             model: db.ProductImage,
-            attributes: ["image_path"]
+            attributes: ["image_path"],
           },
           {
             model: db.Brand,
@@ -131,7 +130,7 @@ let getAllCategories = () => {
       reject(error);
     }
   });
-}
+};
 
 let getAllBrands = () => {
   return new Promise(async (resolve, reject) => {
@@ -144,7 +143,7 @@ let getAllBrands = () => {
       reject(error);
     }
   });
-}
+};
 
 let getAllColors = async () => {
   return new Promise(async (resolve, reject) => {
@@ -172,6 +171,70 @@ let getAllSizes = async () => {
   });
 };
 
+//------------CART SERVICE----------------//
+
+let addToCart = (userId, variantId, quantity) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const variant = await db.ProductVariant.findByPk(variantId);
+
+      if (!variant) {
+        return resolve({
+          errCode: 1,
+          message: "Product variant not found.",
+        });
+      }
+
+      if (variant.stock < quantity) {
+        return resolve({
+          errCode: 2,
+          message: "Insufficient stock.",
+        });
+      }
+
+      let cartItem = await db.CartItem.findOne({
+        where: {
+          user_id: userId,
+
+          product_variant_id: variantId,
+        },
+      });
+
+      if (cartItem) {
+        const newQuantity = cartItem.quantity + quantity;
+
+        if (newQuantity > variant.stock) {
+          return resolve({
+            errCode: 3,
+
+            message: "Quantity exceeds stock.",
+          });
+        }
+
+        await cartItem.update({
+          quantity: newQuantity,
+        });
+      } else {
+        await db.CartItem.create({
+          user_id: userId,
+
+          product_variant_id: variantId,
+
+          quantity,
+        });
+      }
+
+      resolve({
+        errCode: 0,
+
+        message: "Added to cart successfully.",
+      });
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
 let findVariant = async (product_id, color_id, size_id) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -179,32 +242,162 @@ let findVariant = async (product_id, color_id, size_id) => {
         where: {
           product_id,
           color_id,
-          size_id
-        }
+          size_id,
+        },
       });
       resolve(variant);
-    } catch (error) {
-      reject(error);
-    }
-  })
-
-}
-
-let addToCart = async (userId, variantId, quantity) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      await db.CartItem.create({
-        user_id: userId,
-        product_variant_id: variantId,
-        quantity: quantity
-      });
-      resolve();
     } catch (error) {
       reject(error);
     }
   });
 };
 
+let getCart = (userId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const cart = await db.CartItem.findAll({
+        where: {
+          user_id: userId,
+        },
+
+        include: [
+          {
+            model: db.ProductVariant,
+
+            include: [
+              {
+                model: db.Product,
+
+                include: [
+                  {
+                    model: db.ProductImage
+                  }
+                ]
+              },
+              {
+                model: db.Color,
+              },
+              {
+                model: db.Size,
+              },
+            ],
+          },
+        ],
+
+        order: [["createdAt", "DESC"]],
+      });
+
+      resolve(cart);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+let updateCartItem = (userId, cartItemId, quantity) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const cartItem = await db.CartItem.findOne({
+        where: {
+          id: cartItemId,
+
+          user_id: userId,
+        },
+
+        include: [
+          {
+            model: db.ProductVariant,
+          },
+        ],
+      });
+
+      if (!cartItem) {
+        return resolve({
+          errCode: 1,
+
+          message: "Cart item not found.",
+        });
+      }
+
+      if (quantity <= 0) {
+        await cartItem.destroy();
+
+        return resolve({
+          errCode: 0,
+
+          message: "Item removed from cart.",
+        });
+      }
+
+      if (quantity > cartItem.ProductVariant.stock) {
+        return resolve({
+          errCode: 2,
+
+          message: `Only ${cartItem.ProductVariant.stock} items left in stock.`,
+        });
+      }
+
+      await cartItem.update({
+        quantity,
+      });
+
+      resolve({
+        errCode: 0,
+
+        message: "Cart updated successfully.",
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+let deleteCartItem = (userId, cartItemId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const cartItem = await db.CartItem.findOne({
+        where: {
+          id: cartItemId,
+
+          user_id: userId,
+        },
+      });
+
+      if (!cartItem) {
+        return resolve({
+          errCode: 1,
+
+          message: "Cart item not found.",
+        });
+      }
+
+      await cartItem.destroy();
+
+      resolve({
+        errCode: 0,
+
+        message: "Item removed successfully.",
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+// let addToCart = async (userId, variantId, quantity) => {
+//   return new Promise(async (resolve, reject) => {
+//     try {
+//       await db.CartItem.create({
+//         user_id: userId,
+//         product_variant_id: variantId,
+//         quantity: quantity
+//       });
+//       resolve();
+//     } catch (error) {
+//       reject(error);
+//     }
+//   });
+// };
 
 //***********CLOUDINARY UPLOAD***********/
 const uploadToCloudinary = (file) => {
@@ -214,7 +407,7 @@ const uploadToCloudinary = (file) => {
     const stream = cloudinary.uploader.upload_stream(
 
       {
-        folder: "products"
+        folder: "products",
       },
 
       (error, result) => {
@@ -222,15 +415,10 @@ const uploadToCloudinary = (file) => {
         if (error) return reject(error);
 
         resolve(result);
-
-      }
-
+      },
     );
 
-    streamifier
-      .createReadStream(file.buffer)
-      .pipe(stream);
-
+    streamifier.createReadStream(file.buffer).pipe(stream);
   });
 
 };
@@ -241,13 +429,16 @@ let createProduct = (data, files) => {
   return new Promise(async (resolve, reject) => {
     const transaction = await db.sequelize.transaction();
     try {
-      const product = await db.Product.create({
-        productName: data.productName,
-        price: data.price,
-        category_id: data.category_id,
-        brand_id: data.brand_id,
-        product_description: data.product_description
-      }, { transaction });
+      const product = await db.Product.create(
+        {
+          productName: data.productName,
+          price: data.price,
+          category_id: data.category_id,
+          brand_id: data.brand_id,
+          product_description: data.product_description,
+        },
+        { transaction },
+      );
 
       if (files && files.length > 0) {
 
@@ -257,12 +448,12 @@ let createProduct = (data, files) => {
           const uploadResult = await uploadToCloudinary(file);
           images.push({
             product_id: product.id,
-            image_path: uploadResult.secure_url
+            image_path: uploadResult.secure_url,
           });
         }
 
         await db.ProductImage.bulkCreate(images, {
-          transaction
+          transaction,
         });
       }
       await transaction.commit();
@@ -286,6 +477,9 @@ export default {
   getAllColors,
   getAllSizes,
   getImagesByProductId,
+  getCart,
+  updateCartItem,
+  deleteCartItem,
   // getColors,
   // getSizes
 };
