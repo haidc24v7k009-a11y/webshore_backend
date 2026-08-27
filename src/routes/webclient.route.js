@@ -1,5 +1,6 @@
 import express from "express";
 import homeController from "../controllers/homeController";
+
 import { protectedRoute } from "../middleware/authMiddleware";
 import { upload } from "../middleware/upload.middleware";
 
@@ -40,6 +41,45 @@ let initWebRoutes = (app) => {
   );
   //----------------------------------------
   router.get("/product/:id/color/:colorId/sizes", homeController.getSizes);
+
+
+  router.post(
+    "/shoes/order",
+    protectedRoute,
+    homeController.createOrder
+  );
+
+  router.get(
+    "/order",
+    protectedRoute,
+    (req, res, next) => {
+
+      console.log("===== ROUTER ORDER =====");
+
+
+      next();
+    },
+    homeController.getOrder
+  );
+  router.get(
+    "/order/:id",
+    protectedRoute,
+    homeController.getOrderDetail
+  );
+
+  router.put(
+    "/order/:id/cancel",
+    protectedRoute,
+    homeController.cancelOrder
+  );
+
+  router.get(
+    "/payment-methods",
+    protectedRoute,
+    homeController.getPaymentMethods
+  );
+
+
 
   return app.use("/api", router);
 };

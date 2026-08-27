@@ -2,12 +2,10 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Shopping Cart</title>
+    <title>Checkout</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -15,178 +13,218 @@
 
     <style>
         body {
-
-            background: #f8f9fa;
-
-            font-family: "Segoe UI", sans-serif;
-
+            background: #f7f7f7;
+            color: #222;
         }
 
-        .cart-item {
+        .checkout-container {
+            max-width: 1200px;
+            margin: auto;
+        }
 
+        .checkout-title {
+            font-size: 34px;
+            font-weight: 700;
+            margin-bottom: 35px;
+        }
+
+        .checkout-card {
             background: white;
-
-            border-radius: 18px;
-
-            padding: 20px;
-
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid #e9e9e9;
             margin-bottom: 20px;
-
-            transition: .25s;
-
-            border: 1px solid #ececec;
-
         }
 
-        .cart-item:hover {
+        .section-title {
+            font-size: 19px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
 
-            transform: translateY(-3px);
+        /* Address */
 
-            box-shadow: 0 15px 35px rgba(0, 0, 0, .08);
+        .address-item {
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 17px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: .2s;
+        }
 
+        .address-item:hover {
+            border-color: #222;
+        }
+
+        .address-item.active {
+            border: 2px solid #111;
+            background: #fafafa;
+        }
+
+        .address-name {
+            font-weight: 600;
+        }
+
+        .address-phone {
+            color: #666;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .address-detail {
+            color: #666;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .default-badge {
+            background: #111;
+            color: white;
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 20px;
+            margin-left: 8px;
+        }
+
+        /* Payment */
+
+        .payment-item {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .payment-item:hover {
+            border-color: #111;
+        }
+
+        .payment-item.active {
+            border: 2px solid #111;
+            background: #fafafa;
+        }
+
+        .payment-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: #f1f1f1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 14px;
+        }
+
+        .payment-name {
+            font-weight: 600;
+        }
+
+        .payment-description {
+            font-size: 13px;
+            color: #777;
+            margin-top: 3px;
+        }
+
+        /* Order */
+
+        .product-item {
+            display: flex;
+            align-items: center;
+            padding-bottom: 18px;
+            margin-bottom: 18px;
+            border-bottom: 1px solid #eee;
         }
 
         .product-image {
-
-            width: 130px;
-
-            height: 130px;
-
-            object-fit: cover;
-
-            border-radius: 12px;
-
-            background: #f2f2f2;
-
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            background: #f5f5f5;
+            object-fit: contain;
         }
 
-        .summary {
-
-            background: white;
-
-            border-radius: 18px;
-
-            padding: 28px;
-
-            position: sticky;
-
-            top: 30px;
-
-            border: 1px solid #ececec;
-
+        .product-info {
+            flex: 1;
+            margin-left: 15px;
         }
 
-        .quantity {
+        .product-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
 
+        .product-option {
+            color: #777;
+            font-size: 13px;
+        }
+
+        .product-quantity {
+            color: #777;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .product-price {
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        /* Summary */
+
+        .summary-row {
             display: flex;
-
-            align-items: center;
-
-            border: 1px solid #ddd;
-
-            border-radius: 30px;
-
-            overflow: hidden;
-
-            width: fit-content;
-
+            justify-content: space-between;
+            margin-bottom: 13px;
+            color: #555;
         }
 
-        .quantity button {
-
-            border: none;
-
-            background: white;
-
-            width: 40px;
-
-            height: 40px;
-
-            font-size: 18px;
-
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 20px;
+            font-weight: 700;
+            margin-top: 20px;
         }
 
-        .quantity span {
-
-            width: 45px;
-
-            text-align: center;
-
-            font-weight: 600;
-
+        .total-price {
+            color: #d62828;
         }
 
-        .price {
-
-            font-size: 22px;
-
-            font-weight: bold;
-
-        }
-
-        .remove {
-
-            color: #dc3545;
-
-            cursor: pointer;
-
-            font-size: 22px;
-
-        }
-
-        .checkout {
-
+        .place-order-btn {
             width: 100%;
-
-            height: 52px;
-
-            border-radius: 12px;
-
-            font-weight: 600;
-
-        }
-
-        .continue {
-
-            text-decoration: none;
-
-            color: #111;
-
-            font-weight: 600;
-
-        }
-
-        .continue:hover {
-
-            color: black;
-
-        }
-
-        .recommended .card {
-
+            padding: 15px;
+            background: #111;
+            color: white;
             border: none;
-
-            border-radius: 16px;
-
-            transition: .25s;
-
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 16px;
+            margin-top: 25px;
+            transition: .2s;
         }
 
-        .recommended .card:hover {
-
-            transform: translateY(-4px);
-
-            box-shadow: 0 12px 30px rgba(0, 0, 0, .08);
-
+        .place-order-btn:hover {
+            background: #333;
         }
 
-        .recommended img {
+        .place-order-btn i {
+            margin-right: 8px;
+        }
 
-            border-radius: 16px 16px 0 0;
+        textarea {
+            resize: none;
+        }
 
-            height: 220px;
+        @media (max-width: 991px) {
 
-            object-fit: cover;
+            .checkout-title {
+                font-size: 28px;
+            }
 
         }
     </style>
@@ -195,86 +233,116 @@
 
 <body>
 
-    <div class="container py-5">
+    <div class="container py-5 checkout-container">
 
-        <div class="text-center mb-5">
+        <!-- TITLE -->
 
-            <h1 class="fw-bold">
+        <h1 class="checkout-title">
+            Checkout
+        </h1>
 
-                Shopping Cart
 
-            </h1>
+        <div class="row g-4">
 
-            <p class="text-secondary">
+            <!-- ================================= -->
+            <!-- LEFT -->
+            <!-- ================================= -->
 
-                3 items in your shopping bag
+            <div class="col-lg-7">
 
-            </p>
 
-        </div>
+                <!-- SHIPPING ADDRESS -->
 
-        <div class="row">
+                <div class="checkout-card">
 
-            <div class="col-lg-8">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
 
-                <!-- ITEM -->
+                        <h5 class="section-title mb-0">
+                            Shipping Address
+                        </h5>
 
-                <div class="cart-item">
+                        <button class="btn btn-sm btn-outline-dark">
+                            <i class="fa-solid fa-plus me-1"></i>
+                            Add Address
+                        </button>
 
-                    <div class="row align-items-center">
+                    </div>
 
-                        <div class="col-md-2">
 
-                            <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff"
-                                class="product-image w-100">
+                    <!-- Address 1 -->
 
-                        </div>
+                    <div class="address-item active">
 
-                        <div class="col-md-5">
+                        <div class="d-flex">
 
-                            <h5 class="fw-bold">
+                            <input class="form-check-input me-3 mt-1" type="radio" name="address" checked>
 
-                                Nike Air Max 97
+                            <div>
 
-                            </h5>
+                                <div class="address-name">
 
-                            <p class="text-secondary mb-1">
+                                    Hai Vo
 
-                                White • Size 42
+                                    <span class="default-badge">
+                                        Default
+                                    </span>
 
-                            </p>
+                                </div>
 
-                            <small class="text-success">
+                                <div class="address-phone">
 
-                                In Stock
+                                    <i class="fa-solid fa-phone me-1"></i>
 
-                            </small>
+                                    0912345678
 
-                        </div>
+                                </div>
 
-                        <div class="col-md-3">
+                                <div class="address-detail">
 
-                            <div class="quantity">
+                                    <i class="fa-solid fa-location-dot me-1"></i>
 
-                                <button>-</button>
+                                    Ấp 5, Mỹ Cẩm, Càng Long, Trà Vinh
 
-                                <span>2</span>
-
-                                <button>+</button>
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-md-2 text-end">
-
-                            <div class="price mb-3">
-
-                                $160
+                                </div>
 
                             </div>
 
-                            <i class="fa-solid fa-trash remove"></i>
+                        </div>
+
+                    </div>
+
+
+                    <!-- Address 2 -->
+
+                    <div class="address-item">
+
+                        <div class="d-flex">
+
+                            <input class="form-check-input me-3 mt-1" type="radio" name="address">
+
+                            <div>
+
+                                <div class="address-name">
+                                    Hai Vo
+                                </div>
+
+                                <div class="address-phone">
+
+                                    <i class="fa-solid fa-phone me-1"></i>
+
+                                    0909999999
+
+                                </div>
+
+                                <div class="address-detail">
+
+                                    <i class="fa-solid fa-location-dot me-1"></i>
+
+                                    123 Nguyễn Văn Linh, TP. Trà Vinh
+
+                                </div>
+
+                            </div>
 
                         </div>
 
@@ -282,64 +350,91 @@
 
                 </div>
 
-                <!-- ITEM -->
 
-                <div class="cart-item">
+                <!-- PAYMENT -->
 
-                    <div class="row align-items-center">
+                <div class="checkout-card">
 
-                        <div class="col-md-2">
+                    <h5 class="section-title">
+                        Payment Method
+                    </h5>
 
-                            <img src="https://images.unsplash.com/photo-1600185365483-26d7a4cc7519"
-                                class="product-image w-100">
 
-                        </div>
+                    <!-- COD -->
 
-                        <div class="col-md-5">
+                    <div class="payment-item active">
 
-                            <h5 class="fw-bold">
+                        <input class="form-check-input me-3" type="radio" name="payment" checked>
 
-                                Adidas Samba
+                        <div class="payment-icon">
 
-                            </h5>
-
-                            <p class="text-secondary mb-1">
-
-                                Black • Size 41
-
-                            </p>
-
-                            <small class="text-success">
-
-                                In Stock
-
-                            </small>
+                            <i class="fa-solid fa-money-bill-wave"></i>
 
                         </div>
 
-                        <div class="col-md-3">
+                        <div>
 
-                            <div class="quantity">
+                            <div class="payment-name">
+                                Cash on Delivery
+                            </div>
 
-                                <button>-</button>
-
-                                <span>1</span>
-
-                                <button>+</button>
-
+                            <div class="payment-description">
+                                Pay when your order is delivered
                             </div>
 
                         </div>
 
-                        <div class="col-md-2 text-end">
+                    </div>
 
-                            <div class="price mb-3">
 
-                                $120
+                    <!-- BANK -->
 
+                    <div class="payment-item">
+
+                        <input class="form-check-input me-3" type="radio" name="payment">
+
+                        <div class="payment-icon">
+
+                            <i class="fa-solid fa-building-columns"></i>
+
+                        </div>
+
+                        <div>
+
+                            <div class="payment-name">
+                                Bank Transfer
                             </div>
 
-                            <i class="fa-solid fa-trash remove"></i>
+                            <div class="payment-description">
+                                Transfer money directly to our bank account
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ONLINE -->
+
+                    <div class="payment-item">
+
+                        <input class="form-check-input me-3" type="radio" name="payment">
+
+                        <div class="payment-icon">
+
+                            <i class="fa-solid fa-credit-card"></i>
+
+                        </div>
+
+                        <div>
+
+                            <div class="payment-name">
+                                Online Payment
+                            </div>
+
+                            <div class="payment-description">
+                                Pay securely using an online payment gateway
+                            </div>
 
                         </div>
 
@@ -347,213 +442,182 @@
 
                 </div>
 
-                <a href="#" class="continue">
 
-                    <i class="fa-solid fa-arrow-left me-2"></i>
+                <!-- NOTE -->
 
-                    Continue Shopping
+                <div class="checkout-card">
 
-                </a>
+                    <h5 class="section-title">
+                        Order Note
+                    </h5>
+
+                    <textarea class="form-control" rows="4" placeholder="Note for seller..."></textarea>
+
+                </div>
 
             </div>
 
-            <div class="col-lg-4">
 
-                <div class="summary">
+            <!-- ================================= -->
+            <!-- RIGHT -->
+            <!-- ================================= -->
 
-                    <h4 class="fw-bold mb-4">
+            <div class="col-lg-5">
 
-                        Order Summary
+                <div class="checkout-card">
 
-                    </h4>
+                    <h5 class="section-title">
+                        Your Order
+                    </h5>
 
-                    <div class="d-flex justify-content-between mb-3">
+
+                    <!-- PRODUCT 1 -->
+
+                    <div class="product-item">
+
+                        <img src="https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco/..."
+                            class="product-image" alt="Nike Shoes">
+
+                        <div class="product-info">
+
+                            <div class="product-name">
+                                Nike Air Monarch IV
+                            </div>
+
+                            <div class="product-option">
+
+                                White
+
+                                <span class="mx-1">
+                                    ·
+                                </span>
+
+                                Size 42
+
+                            </div>
+
+                            <div class="product-quantity">
+                                Quantity: 2
+                            </div>
+
+                        </div>
+
+                        <div class="product-price">
+                            2.000.000 đ
+                        </div>
+
+                    </div>
+
+
+                    <!-- PRODUCT 2 -->
+
+                    <div class="product-item">
+
+                        <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff" class="product-image"
+                            alt="Nike Shoes">
+
+                        <div class="product-info">
+
+                            <div class="product-name">
+                                Nike Air Max
+                            </div>
+
+                            <div class="product-option">
+
+                                Black
+
+                                <span class="mx-1">
+                                    ·
+                                </span>
+
+                                Size 41
+
+                            </div>
+
+                            <div class="product-quantity">
+                                Quantity: 1
+                            </div>
+
+                        </div>
+
+                        <div class="product-price">
+                            1.500.000 đ
+                        </div>
+
+                    </div>
+
+
+                    <!-- SUMMARY -->
+
+                    <div class="summary-row">
 
                         <span>
-
                             Subtotal
-
                         </span>
 
-                        <strong>
-
-                            $280
-
-                        </strong>
+                        <span>
+                            3.500.000 đ
+                        </span>
 
                     </div>
 
-                    <div class="d-flex justify-content-between mb-3">
+
+                    <div class="summary-row">
 
                         <span>
-
                             Shipping
-
                         </span>
-
-                        <strong class="text-success">
-
-                            Free
-
-                        </strong>
-
-                    </div>
-
-                    <div class="d-flex justify-content-between mb-3">
 
                         <span>
-
-                            Discount
-
+                            30.000 đ
                         </span>
 
-                        <strong>
+                    </div>
 
-                            -$20
 
-                        </strong>
+                    <div class="summary-row">
+
+                        <span>
+                            Discount
+                        </span>
+
+                        <span class="text-danger">
+                            -0 đ
+                        </span>
 
                     </div>
+
 
                     <hr>
 
-                    <div class="d-flex justify-content-between mb-4">
 
-                        <h5>
+                    <div class="summary-total">
 
+                        <span>
                             Total
+                        </span>
 
-                        </h5>
-
-                        <h4 class="fw-bold">
-
-                            $260
-
-                        </h4>
+                        <span class="total-price">
+                            3.530.000 đ
+                        </span>
 
                     </div>
 
-                    <button class="btn btn-dark checkout">
 
-                        Checkout
+                    <button class="place-order-btn">
+
+                        <i class="fa-solid fa-lock"></i>
+
+                        Place Order
 
                     </button>
 
-                </div>
 
-            </div>
+                    <div class="text-center text-secondary small mt-3">
 
-        </div>
+                        <i class="fa-solid fa-shield-halved me-1"></i>
 
-        <div class="recommended mt-5">
-
-            <h3 class="fw-bold mb-4">
-
-                You May Also Like
-
-            </h3>
-
-            <div class="row g-4">
-
-                <div class="col-md-3">
-
-                    <div class="card">
-
-                        <img src="https://images.unsplash.com/photo-1549298916-b41d501d3772">
-
-                        <div class="card-body">
-
-                            <h6>
-
-                                Nike Dunk Low
-
-                            </h6>
-
-                            <strong>
-
-                                $180
-
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="col-md-3">
-
-                    <div class="card">
-
-                        <img src="https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77">
-
-                        <div class="card-body">
-
-                            <h6>
-
-                                Air Force 1
-
-                            </h6>
-
-                            <strong>
-
-                                $210
-
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="col-md-3">
-
-                    <div class="card">
-
-                        <img src="https://images.unsplash.com/photo-1460353581641-37baddab0fa2">
-
-                        <div class="card-body">
-
-                            <h6>
-
-                                New Balance 550
-
-                            </h6>
-
-                            <strong>
-
-                                $175
-
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="col-md-3">
-
-                    <div class="card">
-
-                        <img src="https://images.unsplash.com/photo-1514989940723-e8e51635b782">
-
-                        <div class="card-body">
-
-                            <h6>
-
-                                Adidas Campus
-
-                            </h6>
-
-                            <strong>
-
-                                $165
-
-                            </strong>
-
-                        </div>
+                        Your payment information is secure
 
                     </div>
 
@@ -564,6 +628,48 @@
         </div>
 
     </div>
+
+
+    <script>
+
+        // Address selection
+
+        document.querySelectorAll(".address-item").forEach(item => {
+
+            item.addEventListener("click", function () {
+
+                document
+                    .querySelectorAll(".address-item")
+                    .forEach(el => el.classList.remove("active"));
+
+                this.classList.add("active");
+
+                this.querySelector("input").checked = true;
+
+            });
+
+        });
+
+
+        // Payment selection
+
+        document.querySelectorAll(".payment-item").forEach(item => {
+
+            item.addEventListener("click", function () {
+
+                document
+                    .querySelectorAll(".payment-item")
+                    .forEach(el => el.classList.remove("active"));
+
+                this.classList.add("active");
+
+                this.querySelector("input").checked = true;
+
+            });
+
+        });
+
+    </script>
 
 </body>
 

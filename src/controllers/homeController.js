@@ -265,6 +265,137 @@ let createProduct = async (req, res) => {
   }
 };
 
+//----------------ORDER CONTROLLER----------------//
+let createOrder = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const { shipping_address_id, payment_method_id, note } = req.body;
+
+    // Validate
+
+    if (!shipping_address_id) {
+      return res.status(400).json({
+        errCode: 1,
+        message: "Shipping address is required.",
+      });
+    }
+    if (!payment_method_id) {
+      return res.status(400).json({
+        errCode: 1,
+        message: "Payment method is required.",
+      });
+    }
+    // Create Order
+    const order = await productService.createOrder(userId, {
+      shipping_address_id,
+      payment_method_id,
+      note,
+    });
+
+    return res.status(201).json({
+      errCode: 0,
+
+      message: "Order created successfully.",
+
+      data: order,
+    });
+  } catch (error) {
+    console.error("Create order error:", error);
+
+    return res.status(400).json({
+      errCode: 1,
+
+      message: error.message,
+    });
+  }
+};
+
+let getOrder = async (req, res) => {
+  console.log("========== GET ORDER CONTROLLER ==========");
+  try {
+
+    const userId = req.user.id;
+    console.log("GET ORDER USER ID:", userId);
+
+    const orders =
+      await productService.getOrderByUser(userId);
+
+    return res.status(200).json({
+      errCode: 0,
+      message: "Get orders successfully",
+      data: orders
+    });
+
+  } catch (error) {
+
+    console.error("GET ORDER ERROR:", error);
+    throw error;
+    return res.status(500).json({
+      errCode: -1,
+      message: error.message
+    });
+  }
+}
+let getOrderDetail = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const orderId = req.params.id;
+
+    const order = await productService.getOrderDetail(userId, orderId);
+
+    return res.status(200).json({
+      errCode: 0,
+      message: "Get order detail successfully.",
+      data: order,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(404).json({
+      errCode: 1,
+      message: error.message,
+    });
+  }
+};
+let cancelOrder = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const orderId = req.params.id;
+
+    const order = await productService.cancelOrder(userId, orderId);
+
+    return res.status(200).json({
+      errCode: 0,
+      message: "Order cancelled successfully.",
+      data: order,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(400).json({
+      errCode: 1,
+      message: error.message,
+    });
+  }
+};
+//--------------------------payment controller--------------------------------
+
+let getPaymentMethods = async (req, res) => {
+  try {
+    const paymentMethods = await productService.getAllPaymentMethods();
+    return res.status(200).json({
+      success: true,
+      data: paymentMethods,
+    });
+  } catch (error) {
+    console.error("Get payment methods error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to retrieve payment methods",
+    });
+  }
+};
 export default {
   getHomePage,
   getUserInfo,
@@ -283,6 +414,11 @@ export default {
   addToCart,
   getCart,
   updateCartItem,
-  deleteCartItem
-
+  deleteCartItem,
+  //--oreder--
+  createOrder,
+  getPaymentMethods,
+  getOrder,
+  getOrderDetail,
+  cancelOrder,
 };

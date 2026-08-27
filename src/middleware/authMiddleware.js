@@ -4,6 +4,7 @@ import db from "../models/index";
 
 let protectedRoute = async (req, res, next) => {
   try {
+
     // Get the token from the Authorization header
     const authHeader = req.headers["authorization"];
     const token = req.cookies.accessToken; // Bearer <token>
@@ -54,7 +55,7 @@ let protectedRoute = async (req, res, next) => {
 
 const employeeOnly = (req, res, next) => {
 
-  if (req.account.type !== "employee") {
+  if (req.accountType !== "employee") {
     return res.status(403).json({
       message: "Bạn không có quyền truy cập."
     });

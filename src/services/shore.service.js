@@ -270,9 +270,9 @@ let getCart = (userId) => {
 
                 include: [
                   {
-                    model: db.ProductImage
-                  }
-                ]
+                    model: db.ProductImage,
+                  },
+                ],
               },
               {
                 model: db.Color,
@@ -401,17 +401,13 @@ let deleteCartItem = (userId, cartItemId) => {
 
 //***********CLOUDINARY UPLOAD***********/
 const uploadToCloudinary = (file) => {
-
   return new Promise((resolve, reject) => {
-
     const stream = cloudinary.uploader.upload_stream(
-
       {
         folder: "products",
       },
 
       (error, result) => {
-
         if (error) return reject(error);
 
         resolve(result);
@@ -420,7 +416,6 @@ const uploadToCloudinary = (file) => {
 
     streamifier.createReadStream(file.buffer).pipe(stream);
   });
-
 };
 
 //CRUD Service for Product, ProductVariant, Color, Size, CartItem
@@ -441,7 +436,6 @@ let createProduct = (data, files) => {
       );
 
       if (files && files.length > 0) {
-
         let images = [];
 
         for (const file of files) {
@@ -465,6 +459,381 @@ let createProduct = (data, files) => {
   });
 };
 
+//***********ORDER SERVICE***********/
+let createOrder = async (userId, data) => {
+  const transaction = await db.sequelize.transaction();
+
+  try {
+    const { shipping_address_id, payment_method_id, note } = data;
+    // 1. Kiểm tra shipping address
+
+    const shippingAddress = await db.ShippingAddress.findOne({
+      where: {
+        id: shipping_address_id,
+        user_id: userId,
+      },
+      transaction,
+    });
+
+    if (!shippingAddress) {
+      throw new Error("Shipping address does not belong to this user.");
+    }
+    // 2. Kiểm tra payment method
+    const paymentMethod = await db.PaymentMethod.findByPk(payment_method_id, {
+      transaction,
+    });
+
+    if (!paymentMethod) {
+      throw new Error("Payment method not found.");
+    }
+
+    // 3. Lấy Cart
+
+    const cartItems = await db.CartItem.findAll({
+      where: {
+        user_id: userId,
+      },
+
+      include: [
+        {
+          model: db.ProductVariant,
+
+          include: [
+            {
+              model: db.Product,
+            },
+            {
+              model: db.Color,
+            },
+            {
+              model: db.Size,
+            },
+          ],
+        },
+      ],
+
+      transaction,
+
+      lock: transaction.LOCK.UPDATE,
+    });
+
+    if (!cartItems || cartItems.length === 0) {
+      throw new Error("Your cart is empty.");
+    }
+
+    // 4. Tính tiền + kiểm tra stock
+
+    let initialPrice = 0;
+
+    const orderItems = [];
+
+    for (const cartItem of cartItems) {
+      const variant = cartItem.ProductVariant;
+
+      if (!variant) {
+        throw new Error(
+          `Product variant ${cartItem.product_variant_id} not found.`,
+        );
+      }
+
+      // Kiểm tra stock
+
+      if (variant.stock < cartItem.quantity) {
+        throw new Error(
+          `Product "${variant.Product.productName}" is not enough stock.`,
+        );
+      }
+
+      // Giá sản phẩm
+
+      const price = Number(variant.Product.price);
+
+      const quantity = Number(cartItem.quantity);
+
+      const subtotal = price * quantity;
+
+      initialPrice += subtotal;
+
+      orderItems.push({
+        product_variant_id: variant.id,
+        quantity: quantity,
+        price: price,
+        subtotal: subtotal,
+      });
+    }
+    // 5. Shipping / Discount
+    const shippingFee = 300000;
+
+    const discountAmount = 0;
+
+    const totalAmount = initialPrice + shippingFee - discountAmount;
+
+    // 6. Tạo Order
+
+    const order = await db.Order.create(
+      {
+        user_id: userId,
+
+        shipping_address_id: shipping_address_id,
+
+        payment_method_id: payment_method_id,
+
+        total_amount: totalAmount,
+
+        shipping_fee: shippingFee,
+
+        discount_amount: discountAmount,
+
+        initial_price: initialPrice,
+
+        order_status: "pending",
+
+        delivery_status: "pending",
+
+        note: note || null,
+
+        ordered_at: new Date(),
+      },
+      {
+        transaction,
+      },
+    );
+
+    // 7. Tạo OrderItems
+
+    for (const item of orderItems) {
+      await db.OrderItem.create(
+        {
+          order_id: order.id,
+
+          product_variant_id: item.product_variant_id,
+
+          quantity: item.quantity,
+
+          price: item.price,
+
+          subtotal: item.subtotal,
+        },
+        {
+          transaction,
+        },
+      );
+    }
+
+    // 8. Trừ stock
+
+    for (const cartItem of cartItems) {
+      const variant = cartItem.ProductVariant;
+
+      await variant.decrement("stock", {
+        by: cartItem.quantity,
+
+        transaction,
+      });
+    }
+    // 9. Xóa Cart
+    await db.CartItem.destroy({
+      where: {
+        user_id: userId,
+      },
+
+      transaction,
+    });
+
+    // 10. Commit
+
+    await transaction.commit();
+
+    return order;
+  } catch (error) {
+    await transaction.rollback();
+
+    throw error;
+  }
+};
+
+let getOrderByUser = async (userId) => {
+  try {
+    const orders = await db.Order.findAll({
+      where: {
+        user_id: userId,
+      },
+
+      include: [
+        {
+          model: db.OrderItem,
+
+          include: [
+            {
+              model: db.ProductVariant,
+
+              include: [
+                {
+                  model: db.Product,
+
+                  include: [
+                    {
+                      model: db.ProductImage,
+                    },
+                  ],
+                },
+
+                {
+                  model: db.Color,
+                },
+
+                {
+                  model: db.Size,
+                },
+              ],
+            },
+          ],
+        },
+
+        {
+          model: db.ShippingAddress,
+        },
+
+        {
+          model: db.PaymentMethod,
+        },
+      ],
+
+      order: [["ordered_at", "DESC"]],
+    });
+
+    return orders;
+  } catch (error) {
+    console.error("getOrderByUser error:", error);
+
+    throw error;
+  }
+};
+
+let getOrderDetail = async (userId, orderId) => {
+  const order = await db.Order.findOne({
+    where: {
+      id: orderId,
+      user_id: userId,
+    },
+    include: [
+      {
+        model: db.ShippingAddress,
+      },
+      {
+        model: db.PaymentMethod,
+      },
+      {
+        model: db.OrderItem,
+        include: [
+          {
+            model: db.ProductVariant,
+            include: [
+              {
+                model: db.Product,
+                include: [
+                  {
+                    model: db.ProductImage
+                  }
+                ]
+              },
+              {
+                model: db.Color,
+              },
+              {
+                model: db.Size,
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  });
+
+  if (!order) {
+    throw new Error("Order not found.");
+  }
+
+  return order;
+};
+
+let cancelOrder = async (userId, orderId) => {
+  const transaction = await db.sequelize.transaction();
+
+  try {
+    const order = await db.Order.findOne({
+      where: {
+        id: orderId,
+        user_id: userId,
+      },
+      include: [
+        {
+          model: db.OrderItem,
+        },
+      ],
+      transaction,
+      lock: transaction.LOCK.UPDATE,
+    });
+
+    if (!order) {
+      throw new Error("Order not found.");
+    }
+
+    // Chỉ cho phép hủy khi đơn đang pending
+    if (order.order_status !== "pending") {
+      throw new Error("This order cannot be cancelled.");
+    }
+
+    // Trả lại stock
+    for (const item of order.OrderItems) {
+      const variant = await db.ProductVariant.findByPk(
+        item.product_variant_id,
+        {
+          transaction,
+          lock: transaction.LOCK.UPDATE,
+        },
+      );
+
+      if (variant) {
+        await variant.increment("stock", {
+          by: item.quantity,
+          transaction,
+        });
+      }
+    }
+
+    // Cập nhật trạng thái
+    order.order_status = "cancelled";
+    order.delivery_status = "cancelled";
+
+    await order.save({
+      transaction,
+    });
+
+    await transaction.commit();
+
+    return order;
+  } catch (error) {
+    await transaction.rollback();
+    throw error;
+  }
+};
+
+/**************Payment service********************/
+
+let getAllPaymentMethods = async () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const paymentMethods = await db.PaymentMethod.findAll({
+        attributes: ["id", "method_name", "description"],
+      });
+      resolve(paymentMethods);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 export default {
   getAllProduct,
   getProductById,
@@ -480,6 +849,12 @@ export default {
   getCart,
   updateCartItem,
   deleteCartItem,
+  getAllPaymentMethods,
+  createOrder,
+  getOrderByUser,
+  getOrderDetail,
+  cancelOrder,
+
   // getColors,
   // getSizes
 };

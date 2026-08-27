@@ -2,7 +2,7 @@ import express from "express";
 import homeController from "../controllers/homeController";
 import authController from "../controllers/authh.controller.js";
 import adminController from "../controllers/admin.controller.js";
-import shipAddressController from "../controllers/shippingAdress.controller.js";
+import shipAddressController from "../controllers/shipping.controller.js";
 import { protectedRoute } from "../middleware/authMiddleware";
 import { upload } from "../middleware/upload.middleware.js";
 let router = express.Router();
@@ -75,6 +75,11 @@ let initAuthRoutes = (app) => {
     shipAddressController.getWards
   );
 
+  router.post(
+    "/shipping/fee",
+    protectedRoute,
+    shipAddressController.calculateShippingFee
+  );
 
 
   return app.use("/api", router);

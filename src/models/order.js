@@ -19,6 +19,10 @@ module.exports = (sequelize, DataTypes) => {
       Order.hasMany(models.OrderItem, {
         foreignKey: "order_id",
       });
+      Order.belongsTo(models.Employee, {
+        foreignKey: "employee_id",
+        as: "Employee"
+      });
     }
   }
 
@@ -36,6 +40,10 @@ module.exports = (sequelize, DataTypes) => {
       ordered_at: DataTypes.DATE,
       delivery_date: DataTypes.DATE,
       initinal_price: DataTypes.DECIMAL(12, 2),
+      employee_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true
+      },
     },
     {
       sequelize,

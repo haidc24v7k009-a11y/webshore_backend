@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    ```
+    <title>My Orders - FSTORE</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+        body {
+            background: #f8f9fa;
+            color: #212529;
+            font-family: Arial, sans-serif;
+        }
+
+        .page-title {
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        /* =========================
+       PROFILE LAYOUT
+    ========================= */
+
+        .profile-card {
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, .05);
+        }
+
+        .sidebar {
+            min-height: 650px;
+            border-right: 1px solid #eee;
+        }
+
+        .avatar-wrapper {
+            width: 110px;
+            height: 110px;
+            margin: auto;
+            position: relative;
+        }
+
+        .avatar {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #f1f1f1;
+        }
+
+        .camera {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: #222;
+            color: white;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            cursor: pointer;
+        }
+
+        .sidebar-menu .list-group-item {
+            border: 0;
+            padding: 14px 22px;
+            transition: .2s;
+        }
+
+        .sidebar-menu .list-group-item:hover {
+            padding-left: 28px;
+            background: #f7f7f7;
+        }
+
+        .sidebar-menu .list-group-item.active {
+            background: #111;
+            color: #fff;
+        }
+
+        /* =========================
+       ORDER PAGE
+    ========================= */
+
+        .order-page {
+            padding: 35px;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .order-count {
+            background: #f1f1f1;
+            border-radius: 20px;
+            padding: 7px 14px;
+            font-size: 13px;
+            color: #555;
+        }
+
+        /* =========================
+       FILTER
+    ========================= */
+
+        .order-filter {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+
+        .filter-btn {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+
+            padding: 8px 16px;
+
+            font-size: 13px;
+            white-space: nowrap;
+
+            transition: .2s;
+        }
+
+        .filter-btn:hover {
+            background: #f3f3f3;
+        }
+
+        .filter-btn.active {
+            background: #111;
+            border-color: #111;
+            color: #fff;
+        }
+
+        /* =========================
+       ORDER CARD
+    ========================= */
+
+        .order-card {
+            background: #fff;
+            border: 1px solid #e5e5e5;
+            border-radius: 10px;
+
+            margin-bottom: 15px;
+
+            overflow: hidden;
+
+            transition: .2s;
+        }
+
+        .order-card:hover {
+            box-shadow: 0 5px 20px rgba(0, 0, 0, .06);
+        }
+
+        .order-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            padding: 17px 20px;
+
+            border-bottom: 1px solid #eee;
+        }
+
+        .order-label {
+            color: #999;
+            font-size: 11px;
+        }
+
+        .order-id {
+            font-weight: 600;
+            margin-top: 3px;
+        }
+
+        /* =========================
+       STATUS
+    ========================= */
+
+        .status {
+            display: inline-block;
+
+            padding: 6px 12px;
+
+            border-radius: 20px;
+
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-confirmed {
+            background: #e2e3e5;
+            color: #41464b;
+        }
+
+        .status-shipping {
+            background: #cff4fc;
+            color: #055160;
+        }
+
+        .status-completed {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .status-cancelled {
+            background: #f8d7da;
+            color: #842029;
+        }
+
+        /* =========================
+       PRODUCT
+    ========================= */
+
+        .order-product {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+
+            padding: 20px;
+        }
+
+        .product-image {
+            width: 75px;
+            height: 75px;
+
+            object-fit: cover;
+
+            border-radius: 8px;
+
+            background: #f1f1f1;
+        }
+
+        .product-info {
+            flex: 1;
+        }
+
+        .product-info h6 {
+            margin-bottom: 5px;
+        }
+
+        .order-price {
+            text-align: right;
+        }
+
+        .order-price strong {
+            display: block;
+            margin-top: 3px;
+        }
+
+        /* =========================
+       FOOTER
+    ========================= */
+
+        .order-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            padding: 14px 20px;
+
+            border-top: 1px solid #eee;
+        }
+
+        .btn-detail {
+            border: 0;
+            background: transparent;
+
+            font-size: 13px;
+            font-weight: 600;
+
+            padding: 5px 0;
+        }
+
+        .btn-detail:hover {
+            opacity: .55;
+        }
+
+        /* =========================
+       DETAIL PAGE
+    ========================= */
+
+        #orderDetail {
+            display: none;
+        }
+
+        .back-btn {
+            border: 0;
+            background: transparent;
+
+            padding: 0;
+
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .detail-card {
+            background: #fff;
+
+            border: 1px solid #e5e5e5;
+            border-radius: 10px;
+
+            padding: 22px;
+        }
+
+        /* =========================
+       TIMELINE
+    ========================= */
+
+        .timeline {
+            display: flex;
+            justify-content: space-between;
+
+            position: relative;
+        }
+
+        .timeline::before {
+            content: "";
+
+            position: absolute;
+
+            top: 15px;
+            left: 10%;
+            right: 10%;
+
+            height: 2px;
+
+            background: #ddd;
+        }
+
+        .timeline-step {
+            position: relative;
+            z-index: 1;
+
+            display: flex;
+            flex-direction: column;
+
+            align-items: center;
+
+            gap: 8px;
+
+            color: #aaa;
+
+            font-size: 11px;
+
+            text-align: center;
+        }
+
+        .timeline-circle {
+            width: 30px;
+            height: 30px;
+
+            border-radius: 50%;
+
+            background: #eee;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .timeline-step.active {
+            color: #111;
+            font-weight: 600;
+        }
+
+        .timeline-step.active .timeline-circle {
+            background: #111;
+            color: #fff;
+        }
+
+        /* =========================
+       DETAIL PRODUCT
+    ========================= */
+
+        .detail-product {
+            display: flex;
+            align-items: center;
+
+            gap: 15px;
+
+            padding: 15px 0;
+
+            border-bottom: 1px solid #eee;
+        }
+
+        .detail-product:last-child {
+            border-bottom: 0;
+        }
+
+        .detail-image {
+            width: 75px;
+            height: 75px;
+
+            object-fit: cover;
+
+            border-radius: 8px;
+
+            background: #f5f5f5;
+        }
+
+        .detail-product-info {
+            flex: 1;
+        }
+
+        /* =========================
+       SUMMARY
+    ========================= */
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+
+            margin-bottom: 14px;
+
+            color: #666;
+
+            font-size: 14px;
+        }
+
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+
+            font-size: 17px;
+        }
+
+        /* =========================
+       RESPONSIVE
+    ========================= */
+
+        @media (max-width: 991px) {
+
+            .sidebar {
+                min-height: auto;
+                border-right: 0;
+                border-bottom: 1px solid #eee;
+            }
+
+        }
+
+        @media (max-width: 768px) {
+
+            .order-page {
+                padding: 20px 15px;
+            }
+
+            .order-header {
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .order-product {
+                align-items: flex-start;
+            }
+
+            .order-price {
+                display: none;
+            }
+
+            .order-footer {
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .detail-header {
+                align-items: flex-start;
+            }
+
+            .detail-product strong {
+                display: none;
+            }
+
+        }
+    </style>
+    ```
+
+</head>
+
+<body>
+
+    <div class="container py-5">
+
+        ```
+        <h1 class="text-center page-title mb-5">
+            Tài Khoản Của Tôi
+        </h1>
+
+
+        <div class="profile-card">
+
+            <div class="row g-0">
+
+                <!-- =========================
+             SIDEBAR
+        ========================== -->
+
+                <div class="col-lg-3 sidebar">
+
+                    <div class="text-center p-4">
+
+                        <div class="avatar-wrapper">
+
+                            <img src="https://i.pravatar.cc/150?img=12" class="avatar">
+
+                            <div class="camera">
+                                <i class="fa-solid fa-camera"></i>
+                            </div>
+
+                        </div>
+
+                        <h6 class="fw-bold mt-3 mb-1">
+                            Nguyễn Văn A
+                        </h6>
+
+                        <p class="text-secondary small mb-0">
+                            nguyenvana@gmail.com
+                        </p>
+
+                    </div>
+
+
+                    <div class="list-group sidebar-menu list-group-flush">
+
+                        <button class="list-group-item list-group-item-action">
+                            <i class="fa-regular fa-user me-2"></i>
+                            Hồ sơ cá nhân
+                        </button>
+
+                        <button class="list-group-item list-group-item-action">
+                            <i class="fa-solid fa-location-dot me-2"></i>
+                            Địa chỉ giao hàng
+                        </button>
+
+                        <button class="list-group-item list-group-item-action active">
+                            <i class="fa-solid fa-box me-2"></i>
+                            Đơn hàng
+                        </button>
+
+                        <button class="list-group-item list-group-item-action text-danger">
+                            <i class="fa-solid fa-right-from-bracket me-2"></i>
+                            Đăng xuất
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =========================
+             CONTENT
+        ========================== -->
+
+                <div class="col-lg-9">
+
+
+                    <!-- =========================
+                 ORDER LIST
+            ========================== -->
+
+                    <div id="orderList" class="order-page">
+
+                        <div class="order-header">
+
+                            <div>
+
+                                <h4 class="fw-bold mb-1">
+                                    Đơn hàng của tôi
+                                </h4>
+
+                                <p class="text-muted small mb-0">
+                                    Theo dõi và quản lý các đơn hàng của bạn
+                                </p>
+
+                            </div>
+
+                            <span class="order-count">
+                                4 đơn hàng
+                            </span>
+
+                        </div>
+
+
+                        <!-- FILTER -->
+
+                        <div class="order-filter mt-4">
+
+                            <button class="filter-btn active">
+                                Tất cả
+                            </button>
+
+                            <button class="filter-btn">
+                                Chờ xác nhận
+                            </button>
+
+                            <button class="filter-btn">
+                                Đang giao
+                            </button>
+
+                            <button class="filter-btn">
+                                Đã giao
+                            </button>
+
+                            <button class="filter-btn">
+                                Đã hủy
+                            </button>
+
+                        </div>
+
+
+                        <!-- ORDER 1 -->
+
+                        <div class="order-card mt-4">
+
+                            <div class="order-top">
+
+                                <div>
+
+                                    <span class="order-label">
+                                        MÃ ĐƠN HÀNG
+                                    </span>
+
+                                    <div class="order-id">
+                                        #ORD001
+                                    </div>
+
+                                </div>
+
+                                <span class="status status-pending">
+                                    Chờ xác nhận
+                                </span>
+
+                            </div>
+
+
+                            <div class="order-product">
+
+                                <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200"
+                                    class="product-image">
+
+                                <div class="product-info">
+
+                                    <h6 class="fw-bold">
+                                        Nike Air Force 1
+                                    </h6>
+
+                                    <p class="text-muted small mb-1">
+                                        Size 42 &nbsp; | &nbsp; White
+                                    </p>
+
+                                    <p class="text-muted small mb-0">
+                                        2 sản phẩm
+                                        · Đặt ngày 26/08/2026
+                                    </p>
+
+                                </div>
+
+                                <div class="order-price">
+
+                                    <span class="text-muted small">
+                                        Tổng tiền
+                                    </span>
+
+                                    <strong>
+                                        2.500.000 ₫
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="order-footer">
+
+                                <span class="text-muted small">
+                                    Đơn hàng đang chờ xác nhận
+                                </span>
+
+                                <button class="btn-detail" onclick="showDetail()">
+                                    Xem chi tiết
+                                    <i class="fa-solid fa-arrow-right ms-1"></i>
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ORDER 2 -->
+
+                        <div class="order-card">
+
+                            <div class="order-top">
+
+                                <div>
+
+                                    <span class="order-label">
+                                        MÃ ĐƠN HÀNG
+                                    </span>
+
+                                    <div class="order-id">
+                                        #ORD002
+                                    </div>
+
+                                </div>
+
+                                <span class="status status-shipping">
+                                    Đang giao
+                                </span>
+
+                            </div>
+
+
+                            <div class="order-product">
+
+                                <img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?w=200"
+                                    class="product-image">
+
+                                <div class="product-info">
+
+                                    <h6 class="fw-bold">
+                                        Adidas Ultraboost
+                                    </h6>
+
+                                    <p class="text-muted small mb-1">
+                                        Size 41 &nbsp; | &nbsp; Black
+                                    </p>
+
+                                    <p class="text-muted small mb-0">
+                                        1 sản phẩm
+                                        · Đặt ngày 23/08/2026
+                                    </p>
+
+                                </div>
+
+                                <div class="order-price">
+
+                                    <span class="text-muted small">
+                                        Tổng tiền
+                                    </span>
+
+                                    <strong>
+                                        3.200.000 ₫
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="order-footer">
+
+                                <span class="text-muted small">
+                                    Đơn hàng đang được giao
+                                </span>
+
+                                <button class="btn-detail" onclick="showDetail()">
+                                    Xem chi tiết
+                                    <i class="fa-solid fa-arrow-right ms-1"></i>
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ORDER 3 -->
+
+                        <div class="order-card">
+
+                            <div class="order-top">
+
+                                <div>
+
+                                    <span class="order-label">
+                                        MÃ ĐƠN HÀNG
+                                    </span>
+
+                                    <div class="order-id">
+                                        #ORD003
+                                    </div>
+
+                                </div>
+
+                                <span class="status status-completed">
+                                    Đã giao
+                                </span>
+
+                            </div>
+
+
+                            <div class="order-product">
+
+                                <img src="https://images.unsplash.com/photo-1552346154-21d32810aba3?w=200"
+                                    class="product-image">
+
+                                <div class="product-info">
+
+                                    <h6 class="fw-bold">
+                                        Nike Dunk Low
+                                    </h6>
+
+                                    <p class="text-muted small mb-1">
+                                        Size 40 &nbsp; | &nbsp; White / Black
+                                    </p>
+
+                                    <p class="text-muted small mb-0">
+                                        3 sản phẩm
+                                        · Đặt ngày 15/08/2026
+                                    </p>
+
+                                </div>
+
+                                <div class="order-price">
+
+                                    <span class="text-muted small">
+                                        Tổng tiền
+                                    </span>
+
+                                    <strong>
+                                        4.100.000 ₫
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="order-footer">
+
+                                <span class="text-muted small">
+                                    Đơn hàng đã giao thành công
+                                </span>
+
+                                <button class="btn-detail" onclick="showDetail()">
+                                    Xem chi tiết
+                                    <i class="fa-solid fa-arrow-right ms-1"></i>
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ORDER 4 -->
+
+                        <div class="order-card">
+
+                            <div class="order-top">
+
+                                <div>
+
+                                    <span class="order-label">
+                                        MÃ ĐƠN HÀNG
+                                    </span>
+
+                                    <div class="order-id">
+                                        #ORD004
+                                    </div>
+
+                                </div>
+
+                                <span class="status status-cancelled">
+                                    Đã hủy
+                                </span>
+
+                            </div>
+
+
+                            <div class="order-product">
+
+                                <img src="https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=200"
+                                    class="product-image">
+
+                                <div class="product-info">
+
+                                    <h6 class="fw-bold">
+                                        Adidas Samba
+                                    </h6>
+
+                                    <p class="text-muted small mb-1">
+                                        Size 42 &nbsp; | &nbsp; White
+                                    </p>
+
+                                    <p class="text-muted small mb-0">
+                                        1 sản phẩm
+                                        · Đặt ngày 10/08/2026
+                                    </p>
+
+                                </div>
+
+                                <div class="order-price">
+
+                                    <span class="text-muted small">
+                                        Tổng tiền
+                                    </span>
+
+                                    <strong>
+                                        2.800.000 ₫
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="order-footer">
+
+                                <span class="text-muted small">
+                                    Đơn hàng đã bị hủy
+                                </span>
+
+                                <button class="btn-detail" onclick="showDetail()">
+                                    Xem chi tiết
+                                    <i class="fa-solid fa-arrow-right ms-1"></i>
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =========================
+                 ORDER DETAIL
+            ========================== -->
+
+                    <div id="orderDetail" class="order-page">
+
+                        <button class="back-btn" onclick="showList()">
+                            <i class="fa-solid fa-arrow-left me-2"></i>
+                            Đơn hàng của tôi
+                        </button>
+
+
+                        <div class="detail-header mt-4">
+
+                            <div>
+
+                                <h4 class="fw-bold mb-1">
+                                    Chi tiết đơn hàng
+                                </h4>
+
+                                <span class="text-muted">
+                                    #ORD001
+                                </span>
+
+                            </div>
+
+                            <div class="text-end">
+
+                                <span class="status status-pending">
+                                    Chờ xác nhận
+                                </span>
+
+                                <p class="text-muted small mt-2 mb-0">
+                                    26/08/2026
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- TIMELINE -->
+
+                        <div class="detail-card mt-4">
+
+                            <h6 class="fw-bold mb-4">
+                                Trạng thái đơn hàng
+                            </h6>
+
+                            <div class="timeline">
+
+                                <div class="timeline-step active">
+
+                                    <div class="timeline-circle">
+                                        <i class="fa-solid fa-check"></i>
+                                    </div>
+
+                                    <span>
+                                        Đặt hàng
+                                    </span>
+
+                                </div>
+
+
+                                <div class="timeline-step">
+
+                                    <div class="timeline-circle">
+                                        2
+                                    </div>
+
+                                    <span>
+                                        Xác nhận
+                                    </span>
+
+                                </div>
+
+
+                                <div class="timeline-step">
+
+                                    <div class="timeline-circle">
+                                        3
+                                    </div>
+
+                                    <span>
+                                        Đang giao
+                                    </span>
+
+                                </div>
+
+
+                                <div class="timeline-step">
+
+                                    <div class="timeline-circle">
+                                        4
+                                    </div>
+
+                                    <span>
+                                        Đã giao
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="row mt-4">
+
+                            <!-- LEFT -->
+
+                            <div class="col-lg-7">
+
+
+                                <!-- PRODUCTS -->
+
+                                <div class="detail-card">
+
+                                    <h6 class="fw-bold mb-3">
+                                        Sản phẩm
+                                    </h6>
+
+
+                                    <div class="detail-product">
+
+                                        <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200"
+                                            class="detail-image">
+
+                                        <div class="detail-product-info">
+
+                                            <h6 class="fw-bold mb-1">
+                                                Nike Air Force 1
+                                            </h6>
+
+                                            <p class="text-muted small mb-1">
+                                                Size: 42
+                                                &nbsp; | &nbsp;
+                                                Color: White
+                                            </p>
+
+                                            <span class="text-muted small">
+                                                x1
+                                            </span>
+
+                                        </div>
+
+                                        <strong>
+                                            1.500.000 ₫
+                                        </strong>
+
+                                    </div>
+
+
+                                    <div class="detail-product">
+
+                                        <img src="https://images.unsplash.com/photo-1552346154-21d32810aba3?w=200"
+                                            class="detail-image">
+
+                                        <div class="detail-product-info">
+
+                                            <h6 class="fw-bold mb-1">
+                                                Nike Dunk Low
+                                            </h6>
+
+                                            <p class="text-muted small mb-1">
+                                                Size: 41
+                                                &nbsp; | &nbsp;
+                                                Color: Black
+                                            </p>
+
+                                            <span class="text-muted small">
+                                                x1
+                                            </span>
+
+                                        </div>
+
+                                        <strong>
+                                            1.000.000 ₫
+                                        </strong>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- ADDRESS -->
+
+                                <div class="detail-card mt-3">
+
+                                    <h6 class="fw-bold mb-3">
+                                        Địa chỉ giao hàng
+                                    </h6>
+
+                                    <strong>
+                                        Nguyễn Văn A
+                                    </strong>
+
+                                    <p class="text-muted small mb-1">
+                                        0123 456 789
+                                    </p>
+
+                                    <p class="text-muted small mb-0">
+                                        123 Nguyễn Trãi,
+                                        Phường Bến Thành,
+                                        Quận 1,
+                                        TP. Hồ Chí Minh
+                                    </p>
+
+                                </div>
+
+
+                                <!-- PAYMENT -->
+
+                                <div class="detail-card mt-3">
+
+                                    <h6 class="fw-bold mb-3">
+                                        Phương thức thanh toán
+                                    </h6>
+
+                                    <div class="d-flex align-items-center gap-3">
+
+                                        <i class="fa-solid fa-credit-card fs-5"></i>
+
+                                        <span>
+                                            Thanh toán khi nhận hàng
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- RIGHT -->
+
+                            <div class="col-lg-5">
+
+
+                                <!-- SUMMARY -->
+
+                                <div class="detail-card">
+
+                                    <h6 class="fw-bold mb-4">
+                                        Tóm tắt đơn hàng
+                                    </h6>
+
+
+                                    <div class="summary-row">
+
+                                        <span>
+                                            Tạm tính
+                                        </span>
+
+                                        <span>
+                                            2.500.000 ₫
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="summary-row">
+
+                                        <span>
+                                            Phí vận chuyển
+                                        </span>
+
+                                        <span>
+                                            0 ₫
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="summary-row">
+
+                                        <span>
+                                            Giảm giá
+                                        </span>
+
+                                        <span>
+                                            -0 ₫
+                                        </span>
+
+                                    </div>
+
+
+                                    <hr>
+
+
+                                    <div class="summary-total">
+
+                                        <span>
+                                            Tổng cộng
+                                        </span>
+
+                                        <strong>
+                                            2.500.000 ₫
+                                        </strong>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- NOTE -->
+
+                                <div class="detail-card mt-3">
+
+                                    <h6 class="fw-bold mb-2">
+                                        Ghi chú
+                                    </h6>
+
+                                    <p class="text-muted small mb-0">
+                                        Vui lòng giao hàng trong giờ hành chính.
+                                    </p>
+
+                                </div>
+
+
+                                <!-- CANCEL -->
+
+                                <button class="btn btn-outline-danger w-100 mt-3">
+                                    Hủy đơn hàng
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+        ```
+
+    </div>
+
+    <script>
+
+        function showDetail() {
+
+            document.getElementById("orderList").style.display = "none";
+
+            document.getElementById("orderDetail").style.display = "block";
+
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+
+        }
+
+
+        function showList() {
+
+            document.getElementById("orderDetail").style.display = "none";
+
+            document.getElementById("orderList").style.display = "block";
+
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+
+        }
+
+
+        // Filter demo
+
+        const filterButtons =
+            document.querySelectorAll(".filter-btn");
+
+        filterButtons.forEach(button => {
+
+            button.addEventListener("click", function () {
+
+                filterButtons.forEach(btn => {
+                    btn.classList.remove("active");
+                });
+
+                this.classList.add("active");
+
+            });
+
+        });
+
+    </script>
+
+</body>
+
+</html>
